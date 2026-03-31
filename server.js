@@ -22,7 +22,7 @@ const adminRoutes = require('./routes/admin'); // Import admin routes
 
 
 const app = express();
-const port = 5000;
+const port = 5005;
 
 // Middleware
 app.use(cors({ 
