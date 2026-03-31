@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sessions in Checkout Page - Technical Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: #2d3748;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2d3748;
+            border-bottom: 3px solid #3182ce;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3182ce;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3182ce;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #4a5568;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .code-block {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .code-block code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+        .highlight {
+            background: #fef5e7;
+            border-left: 4px solid #f6ad55;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .security-note {
+            background: #f0fff4;
+            border-left: 4px solid #48bb78;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .flow-diagram {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .step {
+            display: inline-block;
+            background: #3182ce;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .arrow {
+            display: inline-block;
+            margin: 0 10px;
+            font-size: 20px;
+            color: #718096;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #f7fafc;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        .purpose {
+            font-weight: bold;
+            color: #3182ce;
+        }
+        .example {
+            font-style: italic;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Sessions in Checkout Page - Technical Documentation</h1>
+
+        <h2>📋 What are Sessions?</h2>
+        <p><strong>Sessions</strong> are a way to store user data temporarily on the server-side (backend) while a user is browsing your website. Unlike localStorage (client-side), sessions are managed by the server and are more secure for sensitive operations like authentication and checkout.</p>
+
+        <h2>🔄 How Sessions Work in Your Checkout Page</h2>
+        <p>Your application uses <strong>dual session management</strong>:</p>
+        <ol>
+            <li><strong>Server-side sessions</strong> (Express.js with express-session)</li>
+            <li><strong>Client-side localStorage</strong> for UI state</li>
+        </ol>
+
+        <h3>1. 🖥️ Server-Side Session Setup (server.js)</h3>
+        <div class="code-block">
+// Session middleware configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true, // Prevents XSS attacks
+    sameSite: 'lax',
+    secure: false,  // false for localhost
+    domain: 'localhost'
+  }
+}));
+        </div>
+        <p class="purpose">Purpose: Creates secure server-side storage for user authentication data.</p>
+
+        <h3>2. 🔑 Login Creates Session (routes/profile_register.js)</h3>
+        <div class="code-block">
+// After successful login
+req.session.user = {
+  id: userRow.id,
+  name: userRow.name,
+  email: userRow.email,
+  userType
+};
+
+req.session.save((err) => {
+  if (err) {
+    console.error("❌ Session save error:", err);
+    return res.status(500).json({ success: false, message: "Session save failed" });
+  }
+  return res.json({ success: true, message: "Login successful", user });
+});
+        </div>
+        <p class="purpose">Purpose: Stores authenticated user data on the server.</p>
+
+        <h3>3. 🛒 Checkout Page Uses Sessions (checkout.html)</h3>
+        <div class="code-block">
+function ensureBuyerLoggedIn() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const userSessionJSON = localStorage.getItem('userSession');
+
+  if (!isLoggedIn || !userSessionJSON) {
+    showLoginRequired('You must be logged in as a buyer to proceed to checkout.');
+    return false;
+  }
+
+  try {
+    const userSession = JSON.parse(userSessionJSON);
+    if (userSession.userType !== 'buyer') {
+      showLoginRequired('Please login as a buyer to complete the checkout process.');
+      return false;
+    }
+    return true;
+  } catch (e) {
+    showLoginRequired('Please login to continue.');
+    return false;
+  }
+}
+        </div>
+        <p class="purpose">Purpose: Validates user authentication before allowing checkout.</p>
+
+        <h3>4. 💳 Checkout Process (routes/cart.js)</h3>
+        <div class="code-block">
+router.post('/checkout', (req, res) => {
+  const { cart_key, customer_name, email, address, payment_method } = req.body;
+
+  // No direct session check here - relies on frontend validation
+  // But server-side sessions could be used for additional security
+
+  // Process order...
+});
+        </div>
+
+        <h2>🎯 Key Uses of Sessions in Checkout</h2>
+        <ul>
+            <li><strong>Authentication</strong>: Ensures only logged-in buyers can checkout</li>
+            <li><strong>User Data</strong>: Stores user profile information</li>
+            <li><strong>Security</strong>: Server-side storage prevents tampering</li>
+            <li><strong>State Management</strong>: Maintains login state across page refreshes</li>
+        </ul>
+
+        <h2>🔄 Example Flow</h2>
+        <div class="flow-diagram">
+            <div class="step">1. User logs in</div>
+            <div class="arrow">→</div>
+            <div class="step">2. Server creates req.session.user</div>
+            <div class="arrow">→</div>
+            <div class="step">3. User visits checkout</div>
+            <div class="arrow">→</div>
+            <div class="step">4. Frontend checks localStorage</div>
+            <div class="arrow">→</div>
+            <div class="step">5. Checkout validation</div>
+            <div class="arrow">→</div>
+            <div class="step">6. Order processing</div>
+        </div>
+
+        <h2>🛡️ Security Benefits</h2>
+        <div class="security-note">
+            <h4>Security Features:</h4>
+            <ul>
+                <li><strong>HTTPOnly cookies</strong>: Prevent XSS attacks</li>
+                <li><strong>Server-side storage</strong>: Data not accessible via JavaScript</li>
+                <li><strong>Expiration</strong>: Sessions auto-expire (24 hours in your config)</li>
+                <li><strong>Secure flags</strong>: Can be enabled for HTTPS in production</li>
+            </ul>
+        </div>
+
+        <h2>📊 Session Data Structure</h2>
+        <p>Your application stores user session data in both server-side sessions and localStorage:</p>
+
+        <h3>Server-Side Session (req.session.user)</h3>
+        <div class="code-block">
+{
+  "id": 123,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "userType": "buyer"
+}
+        </div>
+
+        <h3>Client-Side localStorage (userSession)</h3>
+        <div class="code-block">
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "userType": "buyer",
+  "loginTime": "2026-01-15T10:30:00Z",
+  "phone": "+91-9876543210",
+  "address": "123 Main St",
+  "city": "Mumbai",
+  "postal": "400001"
+}
+        </div>
+
+        <h2>📋 Session Management Functions</h2>
+
+        <h3>Check Current Session (routes/profile_register.js)</h3>
+        <div class="code-block">
+// Return current session user
+router.get('/me', (req, res) => {
+  if (req.session && req.session.user) {
+    return res.json({ success: true, user: req.session.user });
+  }
+  return res.json({ success: false, user: null });
+});
+        </div>
+
+        <h3>Logout - Destroy Session (routes/profile_register.js)</h3>
+        <div class="code-block">
+// Logout - destroy session
+router.post('/logout', (req, res) => {
+  if (req.session) {
+    req.session.destroy(err => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        return res.status(500).json({ success: false, message: 'Logout failed' });
+      }
+      return res.json({ success: true, message: 'Logged out successfully' });
+    });
+  } else {
+    return res.json({ success: true, message: 'No active session' });
+  }
+});
+        </div>
+
+        <h2>⚠️ Important Notes</h2>
+        <div class="highlight">
+            <h4>Production Considerations:</h4>
+            <ul>
+                <li>Set <code>secure: true</code> for HTTPS environments</li>
+                <li>Use a strong, unique <code>SESSION_SECRET</code></li>
+                <li>Consider using Redis or database for session storage in production</li>
+                <li>Implement session rotation for security</li>
+            </ul>
+        </div>
+
+        <h2>🔍 Debugging Sessions</h2>
+        <p>To debug session issues in your application:</p>
+        <div class="code-block">
+// Check server-side session
+console.log('Server session:', req.session);
+
+// Check client-side localStorage
+console.log('Client session:', localStorage.getItem('userSession'));
+console.log('Is logged in:', localStorage.getItem('isLoggedIn'));
+        </div>
+
+        <p><strong>Created:</strong> March 15, 2026<br>
+        <strong>Documentation for:</strong> BuildMart Checkout System</p>
+    </div>
+</body>
+</html>

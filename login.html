@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body style="margin:0;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-size:cover;min-height:100vh;display:flex;flex-direction:column;padding:0;color:#fff;overflow-x:hidden;">
+
+  
+
+  <div id="navbar-container"></div>
+  
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:15px;">
+  
+ 
+  <form id="loginForm" onsubmit="submitLogin(event)" 
+    style="
+      width:100%;
+      max-width:380px;
+      background:rgb(75, 71, 71);
+      padding:25px 40px;
+      border-radius:14px;margin-top: 50px;margin-bottom: 50px;
+      box-shadow:0 8px 25px rgba(32, 4, 4, 0);
+    ">
+
+    <h2 style="text-align:center;margin-bottom:30px;color:white;font-size:24px;">
+      Login to Your Account
+    </h2>
+
+    <label style="display:block;margin-bottom:6px;font-size:14px;">Email </label>
+    <input type="email" id="identifier" name="email" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Enter a valid email address"
+      style="
+        width:92%;
+        padding:14px;
+        margin-bottom:15px;
+        border:1px solid #ccc;
+        border-radius:8px;
+        font-size:15px;
+        outline:none;
+      ">
+
+    <label style="display:block;margin-bottom:6px;font-size:14px;">Password</label>
+    <input type="password" id="password" required
+      style="
+        width:92%;
+        padding:14px;
+        margin-bottom:12px;
+        border:1px solid #ccc;
+        border-radius:8px;
+        font-size:15px;
+        outline:none;
+      ">
+
+    <label style="display:block;margin:12px 0 6px;font-size:14px;">Login as</label>
+    <div style="display:flex;gap:20px;margin-bottom:15px;font-size:14px;">
+      <label><input type="radio" name="userType" value="buyer" checked> Buyer</label>
+      <label><input type="radio" name="userType" value="seller"> Seller</label>
+    </div>
+
+    <div style="text-align:right;margin-bottom:15px;">
+      <a href="#" style="font-size:13px;color:#f1f5fa;text-decoration:underline;" onclick="showForgotPassword()">Forgot Password?</a>
+    </div>
+
+    <button type="submit"
+      style="
+        width:100%;
+        padding:14px;
+        background:#007BFF;
+        color:#fff;
+        border:none;
+        border-radius:10px;
+        font-size:16px;
+        font-weight:600;
+        cursor:pointer;
+      ">
+      Login
+    </button>
+
+    <p style="margin-top:18px;text-align:center;font-size:13px;color:#f8f3f3;">
+      Don't have an account?
+    </p>
+
+    <div style="text-align:center;font-size:14px;">
+      <a href="buyer_register.html" style="color:#e6ebf0;text-decoration:underline;margin-right:12px;">Buyer Register</a>
+      |
+      <a href="seller_register.html" style="color:#e2e7ec;text-decoration:underline;margin-left:12px;">Seller Register</a>
+    </div>
+
+  </form>
+
+  <!-- Forgot Password Modal (Mobile Friendly) -->
+  <div id="forgotPasswordForm" 
+    style="
+      display:none;
+      width:100%;
+      max-width:380px;
+      background:#ffffff;
+      padding:25px 20px;
+      border-radius:14px;
+      box-shadow:0 8px 25px rgba(0,0,0,0.1);
+      margin-top:20px;
+    ">
+
+    <h2 style="text-align:center;margin-bottom:20px;font-size:22px;color:black;">
+      Reset Password
+    </h2>
+
+    <label style="display:block;margin-bottom:6px;color:black">Email *</label>
+    <input type="email" id="forgotEmail" required
+      style="width:90%;padding:14px;margin-bottom:12px;border:1px solid #ccc;border-radius:8px;">
+
+    <label style="display:block;margin-bottom:6px;color:black">Your Account Type *</label>
+    <div style="display:flex;gap:20px;margin-bottom:15px;font-size:14px;">
+      <label style="color:black;"><input type="radio" name="resetUserType" value="buyer" checked> Buyer</label>
+      <label style="color:black;"><input type="radio" name="resetUserType" value="seller"> Seller</label>
+    </div>
+
+    <button onclick="sendResetOTP()"
+      style="
+        width:100%;
+        padding:14px;
+        background:#007BFF;
+        color:#fff;
+        border:none;
+        border-radius:10px;
+        font-size:16px;
+        cursor:pointer;
+        margin-bottom:10px;
+      ">
+      Send OTP
+    </button>
+ <p style="text-align:center;margin-top:10px;font-size:12px;">
+      <a href="login.html" onclick="backToResetForm()" style="color:#007BFF;text-decoration:underline;">Back</a>
+    </p>
+    <p id="forgotMessage" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:13px;display:none;font-weight:bold;"></p>
+  </div>
+
+  <!-- OTP Verification for Password Reset -->
+  <div id="otpResetForm"
+    style="
+      display:none;
+      width:100%;
+      max-width:380px;
+      background:#ffffff;
+      padding:25px 20px;
+      border-radius:14px;
+      box-shadow:0 8px 25px rgba(0,0,0,0.1);
+      margin-top:20px;
+    ">
+
+    <h2 style="text-align:center;margin-bottom:20px;font-size:22px;color:black;">
+      Verify Email
+    </h2>
+
+    <p style="text-align:center;margin-bottom:15px;font-size:13px;color:#666;">
+      We sent a verification code to your email.
+    </p>
+
+    <label style="display:block;margin-bottom:6px;color:black;">Enter OTP *</label>
+    <input type="text" id="resetOTP" required maxlength="6"
+      style="width:90%;padding:14px;margin-bottom:15px;border:1px solid #ccc;border-radius:8px;" placeholder="6-digit code">
+
+    <button onclick="verifyResetOTP()"
+      style="
+        width:100%;
+        padding:14px;
+        background:#007BFF;
+        color:#fff;
+        border:none;
+        border-radius:10px;
+        font-size:16px;
+        cursor:pointer;
+        margin-bottom:10px;
+      ">
+      Verify OTP
+    </button>
+
+    <p style="text-align:center;margin-top:10px;font-size:12px;">
+      <a href="javascript:void(0)" onclick="resendResetOTP()" style="color:#007BFF;text-decoration:underline;">Resend OTP</a> | 
+      <a href="javascript:void(0)" onclick="backToResetForm()" style="color:#007BFF;text-decoration:underline;">Back</a>
+    </p>
+
+    <p id="otpResetMessage" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:13px;display:none;font-weight:bold;"></p>
+  </div>
+
+  <!-- Password Change Form -->
+  <div id="passwordChangeForm"
+    style="
+      display:none;
+      width:100%;
+      max-width:380px;
+      background:#ffffff;
+      padding:25px 20px;
+      border-radius:14px;
+      box-shadow:0 8px 25px rgba(0,0,0,0.1);
+      margin-top:20px;
+    ">
+
+    <h2 style="text-align:center;margin-bottom:20px;font-size:22px;color:black;">
+      Create New Password
+    </h2>
+
+    <label style="display:block;margin-bottom:6px;color:black;">New Password *</label>
+    <input type="password" id="newPassword" required
+      style="width:90%;padding:14px;margin-bottom:12px;border:1px solid #ccc;border-radius:8px;" placeholder="At least 6 characters">
+
+    <label style="display:block;margin-bottom:6px;color:black;">Confirm Password *</label>
+    <input type="password" id="confirmNewPassword" required
+      style="width:90%;padding:14px;margin-bottom:18px;border:1px solid #ccc;border-radius:8px;" placeholder="Confirm password">
+
+    <button onclick="completePasswordReset()"
+      style="
+        width:100%;
+        padding:14px;
+        background:#007BFF;
+        color:#fff;
+        border:none;
+        border-radius:10px;
+        font-size:16px;
+        cursor:pointer;
+      ">
+      Update Password
+    </button>
+
+    <p id="passwordResetMessage" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:13px;display:none;font-weight:bold;"></p>
+  </div>
+
+  
+
+  <!-- Your existing JS (unchanged) -->
+  <script>
+  async function submitLogin(event) {
+    event.preventDefault();
+    const identifier = document.getElementById('identifier').value.trim();
+    const password = document.getElementById('password').value;
+    const userType = document.querySelector('input[name="userType"]:checked').value;
+
+    const API_BASE = 'http://localhost:5000';
+    try{
+      const res = await fetch(API_BASE + '/api/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password, userType })
+      });
+
+      const data = await res.json();
+
+      if (data && data.success) {
+        // ========== STORE USER SESSION IN LOCALSTORAGE ==========
+        // backend returns the logged-in user under `data.user`
+        const usr = data.user || {};
+        const userInfo = {
+          id: usr.id || usr.userId || null,
+          userId: usr.id || usr.userId || null, // also store under userId for compatibility
+          name: usr.name || usr.username || identifier.split('@')[0],
+          email: usr.email || identifier,
+          userType: userType,
+          loginTime: new Date().toISOString()
+        };
+        
+        if (userInfo.id) {
+          localStorage.setItem('userSession', JSON.stringify(userInfo));
+          localStorage.setItem('isLoggedIn', 'true');
+        } else {
+          console.warn('Login did not return user id', data);
+        }
+        
+        alert("Login successful!");
+        const redirectAfterLogin = localStorage.getItem('afterLoginRedirect');
+        if (redirectAfterLogin) {
+          localStorage.removeItem('afterLoginRedirect');
+        }
+        setTimeout(() => {
+          if (redirectAfterLogin) {
+            window.location.href = redirectAfterLogin;
+            return;
+          }
+          if (userType === 'buyer') {
+            window.location.href = "/index.html";
+          } else {
+            window.location.href = "/seller_dashboard.html";
+          }
+        }, 500);
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (err) {
+      alert("Error logging in");
+      console.error(err);
+    }
+  }
+  </script>
+
+  <script>
+  let resetPasswordData = {};
+  let resetOTPVerified = false;
+
+  async function resetPassword() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmNewPassword').value;
+    const userType = document.querySelector('input[name="userType"]:checked').value;
+
+    if (!email || !newPassword || !confirmPassword) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    const API_BASE = 'http://localhost:5000';
+    try {
+      const res = await fetch(API_BASE + '/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, newPassword, confirmPassword, userType })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        alert('Password reset successful! You can now login with your new password.');
+        document.getElementById('forgotPasswordForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+      } else {
+        alert(data.message || 'Password reset failed');
+      }
+    } catch (err) {
+      alert('Error resetting password');
+      console.error(err);
+    }
+  }
+
+  function showForgotPassword() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('forgotPasswordForm').style.display = 'block';
+  }
+
+  // ======= OTP-based Password Reset Flow =======
+
+  function sendResetOTP() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const userType = document.querySelector('input[name="resetUserType"]:checked').value;
+    const messageEl = document.getElementById('forgotMessage');
+
+    if (!email) {
+      messageEl.style.color = 'red';
+      messageEl.innerText = '❌ Please enter your email';
+      messageEl.style.display = 'block';
+      return;
+    }
+
+    messageEl.style.color = '#007BFF';
+    messageEl.innerText = '⏳ Sending verification code...';
+    messageEl.style.display = 'block';
+
+    // Extract name from email for the OTP email
+    const name = email.split('@')[0];
+
+    fetch('https://buildmarts.in/api/send-otp-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, name, userType })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        resetPasswordData = { email, userType };
+        messageEl.style.display = 'none';
+        document.getElementById('forgotPasswordForm').style.display = 'none';
+        document.getElementById('otpResetForm').style.display = 'block';
+        resetOTPVerified = false;
+        document.getElementById('resetOTP').value = '';
+      } else {
+        messageEl.style.color = 'red';
+        messageEl.innerText = '❌ ' + (data.message || 'Failed to send OTP');
+        messageEl.style.display = 'block';
+      }
+    })
+    .catch(error => {
+      console.error('❌ Error:', error);
+      messageEl.style.color = 'red';
+      messageEl.innerText = '❌ Error: Unable to reach server';
+      messageEl.style.display = 'block';
+    });
+  }
+
+  function verifyResetOTP() {
+    const otp = document.getElementById('resetOTP').value.trim();
+    const messageEl = document.getElementById('otpResetMessage');
+
+    if (!otp) {
+      messageEl.style.color = 'red';
+      messageEl.innerText = '❌ Please enter the OTP';
+      messageEl.style.display = 'block';
+      return;
+    }
+
+    messageEl.style.color = '#007BFF';
+    messageEl.innerText = '⏳ Verifying OTP...';
+    messageEl.style.display = 'block';
+
+    fetch('https://buildmarts.in/api/verify-otp-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: resetPasswordData.email, otp })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        resetOTPVerified = true;
+        messageEl.style.color = 'green';
+        messageEl.innerText = '✅ OTP verified! Enter your new password.';
+        
+        setTimeout(() => {
+          document.getElementById('otpResetForm').style.display = 'none';
+          document.getElementById('passwordChangeForm').style.display = 'block';
+          document.getElementById('otpResetMessage').style.display = 'none';
+        }, 1500);
+      } else {
+        messageEl.style.color = 'red';
+        messageEl.innerText = '❌ ' + (data.message || 'Invalid OTP');
+        messageEl.style.display = 'block';
+      }
+    })
+    .catch(error => {
+      console.error('❌ Error:', error);
+      messageEl.style.color = 'red';
+      messageEl.innerText = '❌ Error: Unable to verify OTP';
+      messageEl.style.display = 'block';
+    });
+  }
+
+  function completePasswordReset() {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmNewPassword').value;
+    const messageEl = document.getElementById('passwordResetMessage');
+
+    if (!newPassword || !confirmPassword) {
+      messageEl.style.color = 'red';
+      messageEl.innerText = '❌ Please fill in all fields';
+      messageEl.style.display = 'block';
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      messageEl.style.color = 'red';
+      messageEl.innerText = '❌ Passwords do not match';
+      messageEl.style.display = 'block';
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      messageEl.style.color = 'red';
+      messageEl.innerText = '❌ Password must be at least 6 characters';
+      messageEl.style.display = 'block';
+      return;
+    }
+
+    messageEl.style.color = '#007BFF';
+    messageEl.innerText = '⏳ Updating password...';
+    messageEl.style.display = 'block';
+
+    fetch('https://buildmarts.in/api/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: resetPasswordData.email,
+        newPassword,
+        confirmPassword,
+        userType: resetPasswordData.userType,
+        otpVerified: resetOTPVerified
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        messageEl.style.color = 'green';
+        messageEl.innerText = '✅ Password reset successful! Redirecting to login...';
+        messageEl.style.display = 'block';
+
+        setTimeout(() => {
+          document.getElementById('passwordChangeForm').style.display = 'none';
+          document.getElementById('loginForm').style.display = 'block';
+          resetPasswordData = {};
+          resetOTPVerified = false;
+        }, 2000);
+      } else {
+        messageEl.style.color = 'red';
+        messageEl.innerText = '❌ ' + (data.message || 'Password reset failed');
+        messageEl.style.display = 'block';
+      }
+    })
+    .catch(error => {
+      console.error('❌ Error:', error);
+      messageEl.style.color = 'red';
+      messageEl.innerText = '❌ Error: Unable to reset password';
+      messageEl.style.display = 'block';
+    });
+  }
+
+  function resendResetOTP() {
+    sendResetOTP();
+  }
+
+  function backToResetForm() {
+    document.getElementById('otpResetForm').style.display = 'none';
+    document.getElementById('forgotPasswordForm').style.display = 'block';
+    document.getElementById('resetOTP').value = '';
+    document.getElementById('otpResetMessage').style.display = 'none';
+    resetOTPVerified = false;
+  }
+  </script>
+
+  <script>
+  // Load shared navbar (injects navbar.html body and executes its scripts)
+  async function includeNavbar() {
+    try {
+      const res = await fetch('navbar.html');
+      const text = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
+      document.getElementById('navbar-container').innerHTML = doc.body.innerHTML;
+
+      // Execute scripts from navbar.html and wait for external scripts to load
+      const __createdScriptPromises = [];
+      doc.querySelectorAll('script').forEach(s => {
+        const newScript = document.createElement('script');
+        if (s.src) {
+          newScript.src = s.src;
+          newScript.async = false;
+          __createdScriptPromises.push(new Promise(resolve => {
+            newScript.addEventListener('load', resolve);
+            newScript.addEventListener('error', resolve);
+            setTimeout(resolve, 2000);
+          }));
+        } else {
+          newScript.textContent = s.textContent;
+        }
+        document.body.appendChild(newScript);
+      });
+      Promise.all(__createdScriptPromises).finally(() => {});
+
+      // Ensure navbar init functions run after dynamic injection (wait for external scripts to load)
+      const __navbarScriptPromises = [];
+      doc.querySelectorAll('script').forEach((s, i) => {
+        const existing = document.querySelectorAll('script')[document.querySelectorAll('script').length - 1 - i];
+        if (existing && existing.src) {
+          __navbarScriptPromises.push(new Promise(resolve => {
+            existing.addEventListener('load', resolve);
+            existing.addEventListener('error', resolve);
+            // also resolve after 2s as a safety
+            setTimeout(resolve, 2000);
+          }));
+        }
+      });
+      Promise.all(__navbarScriptPromises).finally(() => {
+        if (typeof checkScreenSize === 'function') checkScreenSize();
+        if (typeof addDesktopHoverEffects === 'function') addDesktopHoverEffects();
+        if (typeof updateUserUI === 'function') updateUserUI();
+        if (typeof updateCartBadge === 'function') updateCartBadge();
+        if (typeof setActiveNavLink === 'function') setActiveNavLink();
+      });
+    } catch (e) {
+      console.error('Failed to load navbar:', e);
+    }
+  }
+  includeNavbar();
+</script>
+
+<!-- Load Chatbot -->
+<script>
+  async function loadChatbot() {
+    try {
+      const response = await fetch('./chatbot.html');
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const htmlContent = await response.text();
+      
+      // Create a container to hold chatbot
+      const container = document.createElement('div');
+      container.id = 'chatbot-container';
+      container.innerHTML = htmlContent;
+      document.body.appendChild(container);
+      
+      // Extract and re-execute scripts from chatbot.html
+      const scripts = container.querySelectorAll('script');
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        newScript.textContent = oldScript.textContent;
+        document.head.appendChild(newScript);
+      });
+      
+      console.log('✓ Chatbot loaded successfully');
+    } catch (error) {
+      console.error('✗ Chatbot load failed:', error);
+    }
+  }
+  
+  // Load chatbot when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadChatbot);
+  } else {
+    loadChatbot();
+  }
+</script>
+
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+<script>
+  fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+      // execute any scripts from the injected footer
+      const temp = document.createElement('div');
+      temp.innerHTML = data;
+      temp.querySelectorAll('script').forEach(s => {
+        const newScript = document.createElement('script');
+        if (s.src) {
+          newScript.src = s.src;
+        } else {
+          newScript.textContent = s.textContent;
+        }
+        document.body.appendChild(newScript);
+      });
+      // the injected script itself initializes subscription, no need to call again
+      // (prevent duplicate listeners causing conflicting messages)
+    })
+    .catch(error => console.error('Footer load error:', error));
+</script>
+
+
+<!-- Scroll to Top Button -->
+<button id="scrollToTopBtn" style="display: none; position: fixed; bottom: 80px; right: 22px; z-index: 1000; background: linear-gradient(135deg, #3498db, #2980b9); color:white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 33px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s ease;" onclick="scrollToTop()">↑</button>
+
+<style>
+  #scrollToTopBtn:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  }
+</style>
+
+<script>
+  // Show/hide scroll to top button
+  window.addEventListener('scroll', function() {
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+    if (window.pageYOffset > 100) {
+      scrollToTopBtn.style.display = 'block';
+    } else {
+      scrollToTopBtn.style.display = 'none';
+    }
+  });
+
+  // Scroll to top function
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+</script>
+
+
+
+</body>
+</html>        
+  

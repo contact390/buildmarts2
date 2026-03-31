@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head><title>Buyer Register</title></head>
+<body style="font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:0;">
+ 
+ 
+
+ <!DOCTYPE html>
+<html>
+<head><title>Buyer Register</title></head>
+<body style="font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:0;">
+
+  <div id="navbar-container"></div>
+
+  <form id="registerForm" onsubmit="submitForm(event)" style="width:90%;max-width:360px;margin:10px auto 50px;background:#fff;padding:25px 20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center;margin-bottom:20px;">Buyer Registration</h2>
+
+    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Name *</label>
+    <input type="text" id="name" style=" margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Full Name" required>
+
+    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Email *</label>
+    <input type="email" id="email" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="your@email.com" required>
+
+    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Phone Number *</label>
+    <input type="tel" id="phone" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="10-digit number" required>
+
+    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Address *</label>
+    <input type="text" id="address" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Your address" required>
+
+    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Password *</label>
+    <input type="password" id="password" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Min 6 characters" required>
+
+    <div style="text-align:right;">
+      <button type="submit" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 10px;">Register</button>
+    </div>
+
+    <p style="margin-top:15px;text-align:center;font-size:14px;">Already have an account?
+      <a href="login.html" style="color:#007BFF;text-decoration:underline;font-weight:bold;">Login</a>
+    </p>
+
+    <p id="message" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:14px;display:none;font-weight:bold;"></p>
+  </form>
+
+  <!-- OTP Verification Section -->
+  <div id="otpSection" style="display:none;width:90%;max-width:360px;margin:10px auto 50px;background:#fff;padding:25px 20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center;margin-bottom:20px;">Email Verification</h2>
+    
+    <p style="text-align:center;margin-bottom:15px;font-size:14px;color:#666;">
+      We've sent a verification code to your email. Please enter it below.
+    </p>
+
+    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Verification Code *</label>
+    <input type="text" id="otpInput" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Enter 6-digit OTP" maxlength="6" required>
+
+    <div style="text-align:right;">
+      <button type="button" onclick="verifyOTP()" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 10px;">Verify OTP</button>
+    </div>
+
+    <p style="text-align:center;margin-top:15px;font-size:13px;">
+      <a href="javascript:void(0)" onclick="resendOTP()" style="color:#007BFF;text-decoration:underline;">Resend OTP</a> | <a href="javascript:void(0)" onclick="backToForm()" style="color:#007BFF;text-decoration:underline;">Back</a>
+    </p>
+
+    <p id="otpMessage" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:14px;display:none;font-weight:bold;"></p>
+  </div>
+
+  <script>
+    let otpVerified = false;
+    let registrationData = {};
+
+    function submitForm(event) {
+      event.preventDefault();
+      
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const password = document.getElementById('password').value;
+      const messageEl = document.getElementById('message');
+
+      // Validation
+      if (!name || !email || !phone || !address || !password) {
+        messageEl.style.color = 'red';
+        messageEl.innerText = '❌ Please fill in all required fields.';
+        messageEl.style.display = 'block';
+        return;
+      }
+
+      const phoneRegex = /^[6-9]\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        messageEl.style.color = 'red';
+        messageEl.innerText = '❌ Please enter a valid 10-digit mobile number starting with 6-9.';
+        messageEl.style.display = 'block';
+        return;
+      }
+
+      if (password.length < 6) {
+        messageEl.style.color = 'red';
+        messageEl.innerText = '❌ Password must be at least 6 characters long.';
+        messageEl.style.display = 'block';
+        return;
+      }
+
+      // Store registration data
+      registrationData = { name, email, phone, address, password };
+
+      // Send OTP
+      sendOTPForRegistration(email, name);
+    }
+
+    function sendOTPForRegistration(email, name) {
+      const messageEl = document.getElementById('message');
+      messageEl.style.color = '#007BFF';
+      messageEl.innerText = '⏳ Sending verification code...';
+      messageEl.style.display = 'block';
+
+      fetch('https://buildmarts.in/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name, userType: 'buyer' })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          messageEl.style.display = 'none';
+          document.getElementById('registerForm').style.display = 'none';
+          document.getElementById('otpSection').style.display = 'block';
+          otpVerified = false;
+          document.getElementById('otpInput').value = '';
+        } else {
+          messageEl.style.color = 'red';
+          messageEl.innerText = '❌ ' + (data.message || 'Failed to send OTP');
+          messageEl.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        console.error('❌ Error:', error);
+        messageEl.style.color = 'red';
+        messageEl.innerText = '❌ Error: Unable to reach server.';
+        messageEl.style.display = 'block';
+      });
+    }
+
+    function verifyOTP() {
+      const otp = document.getElementById('otpInput').value.trim();
+      const otpMessageEl = document.getElementById('otpMessage');
+      const messageEl = document.getElementById('message');
+
+      if (!otp) {
+        otpMessageEl.style.color = 'red';
+        otpMessageEl.innerText = '❌ Please enter the OTP.';
+        otpMessageEl.style.display = 'block';
+        return;
+      }
+
+      otpMessageEl.style.color = '#007BFF';
+      otpMessageEl.innerText = '⏳ Verifying OTP...';
+      otpMessageEl.style.display = 'block';
+
+      fetch('https://buildmarts.in/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: registrationData.email, otp, userType: 'buyer' })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          otpVerified = true;
+          otpMessageEl.style.color = 'green';
+          otpMessageEl.innerText = '✅ OTP verified! Completing registration...';
+          
+          // Proceed with actual registration
+          completeRegistration();
+        } else {
+          otpMessageEl.style.color = 'red';
+          otpMessageEl.innerText = '❌ ' + (data.message || 'Invalid OTP');
+          otpMessageEl.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        console.error('❌ Error:', error);
+        otpMessageEl.style.color = 'red';
+        otpMessageEl.innerText = '❌ Error: Unable to verify OTP.';
+        otpMessageEl.style.display = 'block';
+      });
+    }
+
+    function completeRegistration() {
+      const messageEl = document.getElementById('message');
+      const otpMessageEl = document.getElementById('otpMessage');
+
+      fetch('https://buildmarts.in/api/buyer-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          ...registrationData, 
+          otpVerified: true 
+        })
+      })
+      .then(response => {
+        console.log('📡 Response status:', response.status);
+        return response.json().then(data => ({ status: response.status, data }));
+      })
+      .then(({ status, data }) => {
+        console.log('📨 Response data:', data);
+        
+        if (status === 200) {
+          otpMessageEl.style.color = 'green';
+          otpMessageEl.innerText = '✅ Registration successful! Redirecting to login...';
+          otpMessageEl.style.display = 'block';
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 2000);
+        } else {
+          otpMessageEl.style.color = 'red';
+          otpMessageEl.innerText = '❌ ' + (data.error || data.message || 'Registration failed. Please try again.');
+          otpMessageEl.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        console.error('❌ Error:', error);
+        otpMessageEl.style.color = 'red';
+        otpMessageEl.innerText = '❌ Error: Unable to complete registration.';
+        otpMessageEl.style.display = 'block';
+      });
+    }
+
+    function resendOTP() {
+      sendOTPForRegistration(registrationData.email, registrationData.name);
+    }
+
+    function backToForm() {
+      document.getElementById('registerForm').style.display = 'block';
+      document.getElementById('otpSection').style.display = 'none';
+      document.getElementById('otpInput').value = '';
+      document.getElementById('otpMessage').style.display = 'none';
+      otpVerified = false;
+    }
+  </script>
+  
+  <div id="footer-placeholder"></div>
+
+<script>
+  fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+      // execute any scripts from the injected footer
+      const temp = document.createElement('div');
+      temp.innerHTML = data;
+      temp.querySelectorAll('script').forEach(s => {
+        const newScript = document.createElement('script');
+        if (s.src) {
+          newScript.src = s.src;
+        } else {
+          newScript.textContent = s.textContent;
+        }
+        document.body.appendChild(newScript);
+      });
+      // the injected script itself initializes subscription, no need to call again
+      // (prevent duplicate listeners causing conflicting messages)
+    })
+    .catch(error => console.error('Footer load error:', error));
+</script>
+
+<div id="footer-placeholder"></div>
+
+<script>
+fetch('footer.html')
+  .then(response => response.text())
+  .then(data => {
+    document.getElementById('footer-placeholder').innerHTML = data;
+  })
+  .catch(error => console.error('Footer load error:', error));
+</script>
+
+
+    <script>
+  // Load shared navbar (injects navbar.html body and executes its scripts)
+  async function includeNavbar() {
+    try {
+      const res = await fetch('navbar.html');
+      const text = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
+      document.getElementById('navbar-container').innerHTML = doc.body.innerHTML;
+
+      // Execute scripts from navbar.html and wait for external scripts to load
+      const __createdScriptPromises = [];
+      doc.querySelectorAll('script').forEach(s => {
+        const newScript = document.createElement('script');
+        if (s.src) {
+          newScript.src = s.src;
+          newScript.async = false;
+          __createdScriptPromises.push(new Promise(resolve => {
+            newScript.addEventListener('load', resolve);
+            newScript.addEventListener('error', resolve);
+            setTimeout(resolve, 2000);
+          }));
+        } else {
+          newScript.textContent = s.textContent;
+        }
+        document.body.appendChild(newScript);
+      });
+      Promise.all(__createdScriptPromises).finally(() => {});
+
+      // Ensure navbar init functions run after dynamic injection (wait for external scripts to load)
+      const __navbarScriptPromises = [];
+      doc.querySelectorAll('script').forEach((s, i) => {
+        const existing = document.querySelectorAll('script')[document.querySelectorAll('script').length - 1 - i];
+        if (existing && existing.src) {
+          __navbarScriptPromises.push(new Promise(resolve => {
+            existing.addEventListener('load', resolve);
+            existing.addEventListener('error', resolve);
+            // also resolve after 2s as a safety
+            setTimeout(resolve, 2000);
+          }));
+        }
+      });
+      Promise.all(__navbarScriptPromises).finally(() => {
+        if (typeof checkScreenSize === 'function') checkScreenSize();
+        if (typeof addDesktopHoverEffects === 'function') addDesktopHoverEffects();
+        if (typeof updateUserUI === 'function') updateUserUI();
+        if (typeof updateCartBadge === 'function') updateCartBadge();
+        if (typeof setActiveNavLink === 'function') setActiveNavLink();
+      });
+    } catch (e) {
+      console.error('Failed to load navbar:', e);
+    }
+  }
+  includeNavbar();
+</script>
+
+
+<!-- Load Chatbot -->
+<script>
+  async function loadChatbot() {
+    try {
+      const response = await fetch('./chatbot.html');
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const htmlContent = await response.text();
+      
+      // Create a container to hold chatbot
+      const container = document.createElement('div');
+      container.id = 'chatbot-container';
+      container.innerHTML = htmlContent;
+      document.body.appendChild(container);
+      
+      // Extract and re-execute scripts from chatbot.html
+      const scripts = container.querySelectorAll('script');
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        newScript.textContent = oldScript.textContent;
+        document.head.appendChild(newScript);
+      });
+      
+      console.log('✓ Chatbot loaded successfully');
+    } catch (error) {
+      console.error('✗ Chatbot load failed:', error);
+    }
+  }
+  
+  // Load chatbot when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadChatbot);
+  } else {
+    loadChatbot();
+  }
+</script>
+
+<!-- Scroll to Top Button -->
+<button id="scrollToTopBtn" style="display: none; position: fixed; bottom: 80px; right: 22px; z-index: 1000; background: linear-gradient(135deg, #3498db, #2980b9); color:white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 33px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s ease;" onclick="scrollToTop()">↑</button>
+
+<style>
+  #scrollToTopBtn:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  }
+</style>
+
+<script>
+  // Show/hide scroll to top button
+  window.addEventListener('scroll', function() {
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+    if (window.pageYOffset > 100) {
+      scrollToTopBtn.style.display = 'block';
+    } else {
+      scrollToTopBtn.style.display = 'none';
+    }
+  });
+
+  // Scroll to top function
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+</script>
+
+
+</body>
+</html>
+

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Hitaishi Building Materials</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            margin: 0;
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        
+        .message.error {
+            background: #fee;
+            color: #c33;
+            display: block;
+        }
+        
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            display: block;
+        }
+        
+        .spinner {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🔐 Admin Panel</h1>
+            <p>Hitaishi Building Materials</p>
+        </div>
+        
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="admin@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <div class="spinner" id="spinner">
+                <p>⏳ Logging in...</p>
+            </div>
+            
+            <div class="message" id="message"></div>
+            
+            <button type="submit" class="login-btn">Login to Admin Panel</button>
+        </form>
+        
+        <div class="login-link">
+            <p style="margin: 20px 0 0 0; font-size: 13px;">
+                Admin? <a href="admin_register.html" style="color: #667eea; text-decoration: none; font-weight: 600;">Register New Admin →</a>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            const spinner = document.getElementById('spinner');
+            
+            // Reset message
+            messageDiv.textContent = '';
+            messageDiv.className = 'message';
+            spinner.classList.remove('show');
+            
+            if (!email || !password) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Email and password are required';
+                return;
+            }
+            
+            try {
+                spinner.classList.add('show');
+                
+                const response = await fetch('https://buildmarts.in/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                spinner.classList.remove('show');
+                
+                if (data.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = 'Login successful! Redirecting...';
+                    
+                    // Redirect to admin dashboard after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.href = 'https://buildmarts.in/admin_dashboard.html';
+                    }, 1500);
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = data.message || 'Login failed';
+                }
+            } catch (error) {
+                spinner.classList.remove('show');
+                console.error('Error:', error);
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Server error. Please try again.';
+            }
+        });
+        
+        // Check if already logged in                                  
+        async function checkAdminSession() {
+            try {
+                const response = await fetch('https://buildmarts.in/api/admin/me', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success && data.user && data.user.userType === 'admin') {
+                    // Already logged in, redirect to dashboard
+                    window.location.href = 'https://buildmarts.in/admin_dashboard.html';
+                }
+            } catch (error) {
+                console.error('Session check failed:', error);
+            }
+        }
+        
+        // Check on page load
+        window.addEventListener('load', checkAdminSession);
+    </script>
+</body>
+</html>

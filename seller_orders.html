@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Seller Orders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f8; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; }
+        th { background: #667eea; color: #fff; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-view { background: #007bff; color: #fff; }
+        .btn-view:hover { background: #0069d9; }
+        .btn-logout { background: #dc3545; color: #fff; float: right; margin-bottom: 10px; }
+        .alert { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        .alert.success { background: #d4edda; color: #155724; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+        #detailContainer { margin-top: 20px; display: none; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+        .debug-info { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; display: none; }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your Orders
+        <button class="btn btn-logout" onclick="logout()">Logout</button>
+    </h1>
+    
+    <div id="debug" class="debug-info"></div>
+    <div id="alert" class="alert"></div>
+    
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="ordersBody">
+        <tr><td colspan="6" class="loading">Loading orders...</td></tr>
+      </tbody>
+    </table>
+
+    <div id="detailContainer">
+      <h3>Order Details</h3>
+      <table id="itemsTable">
+        <thead><tr><th>Name</th><th>Qty</th><th>Price</th></tr></thead>
+        <tbody id="itemsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Debug function
+    function debug(msg, data) {
+        console.log(msg, data);
+        const debugEl = document.getElementById('debug');
+        debugEl.style.display = 'block';
+        debugEl.innerHTML += `<div>${msg}: ${JSON.stringify(data)}</div>`;
+    }
+
+    // Check authentication
+    async function checkAuth() {
+        try {
+            debug('Checking auth...', {});
+            
+            const res = await fetch('https://buildmarts.in/api/me', { 
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            debug('Auth response status', res.status);
+            
+            if (res.status === 401) {
+                debug('Auth failed - 401', {});
+                
+                // Check localStorage
+                const localUser = localStorage.getItem('userSession');
+                if (localUser) {
+                    debug('Found localStorage user', JSON.parse(localUser));
+                    try {
+                        const user = JSON.parse(localUser);
+                        if (user.userType === 'seller') {
+                            // Try to use localStorage user
+                            return user.id;
+                        }
+                    } catch (e) {
+                        console.error('Error parsing localStorage', e);
+                    }
+                }
+                
+                showAlert('Please login first', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                return null;
+            }
+            
+            const data = await res.json();
+            debug('Auth response data', data);
+            
+            if (data.success && data.user) {
+                debug('User authenticated', data.user);
+                
+                // Update localStorage
+                localStorage.setItem('userSession', JSON.stringify(data.user));
+                
+                if (data.user.userType !== 'seller') {
+                    alert('Only sellers can access this page');
+                    window.location.href = 'login.html';
+                    return null;
+                }
+                
+                return data.user.id;
+            } else {
+                debug('Auth failed - no user', {});
+                showAlert('Session expired', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                return null;
+            }
+        } catch (error) {
+            debug('Auth error', error.message);
+            console.error('Auth error:', error);
+            
+            // Try localStorage as fallback
+            const localUser = localStorage.getItem('userSession');
+            if (localUser) {
+                try {
+                    const user = JSON.parse(localUser);
+                    if (user.userType === 'seller') {
+                        return user.id;
+                    }
+                } catch (e) {}
+            }
+            
+            showAlert('Connection error', 'error');
+            return null;
+        }
+    }
+
+    function showAlert(msg, type = 'success') {
+        const el = document.getElementById('alert');
+        el.textContent = msg;
+        el.className = 'alert ' + type;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    async function fetchOrders(sellerId) {
+        try {
+            debug('Fetching orders for seller', sellerId);
+            
+            const res = await fetch(`https://buildmarts.in/api/seller_orders/${sellerId}`, { 
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            debug('Orders response status', res.status);
+            
+            if (res.status === 401) {
+                showAlert('Session expired. Please login again.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                return;
+            }
+            
+            const data = await res.json();
+            debug('Orders data', data);
+            
+            if (data.success) {
+                populateOrders(data.orders);
+            } else {
+                document.querySelector('#ordersBody').innerHTML = '<tr><td colspan="6" class="loading">No orders found</td></tr>';
+                showAlert(data.message || 'Failed to load orders', 'error');
+            }
+        } catch (e) {
+            debug('Fetch orders error', e.message);
+            console.error('Fetch orders error:', e);
+            document.querySelector('#ordersBody').innerHTML = '<tr><td colspan="6" class="loading">Error loading orders</td></tr>';
+            showAlert('Network error. Please try again.', 'error');
+        }
+    }
+
+    function populateOrders(orders) {
+        const tbody = document.querySelector('#ordersBody');
+        
+        if (!orders || orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">No orders found</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        orders.forEach(o => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${o.id}</td>
+                <td>${o.customer_name || 'N/A'}</td>
+                <td>₹${parseFloat(o.total).toFixed(2)}</td>
+                <td>${o.status || 'Pending'}</td>
+                <td>${o.created_at ? new Date(o.created_at).toLocaleString() : 'N/A'}</td>
+                <td><button class="btn btn-view" onclick="loadDetails(${o.id})">View</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function loadDetails(orderId) {
+        try {
+            const res = await fetch(`https://buildmarts.in/api/order/${orderId}`, { 
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (res.status === 401) {
+                showAlert('Session expired. Please login again.', 'error');
+                return;
+            }
+            
+            const data = await res.json();
+            
+            if (data.success) {
+                const tbody = document.querySelector('#itemsBody');
+                
+                if (!data.items || data.items.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="loading">No items found</td></tr>';
+                } else {
+                    tbody.innerHTML = '';
+                    data.items.forEach(i => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${i.name || 'N/A'}</td><td>${i.qty || 0}</td><td>₹${parseFloat(i.price || 0).toFixed(2)}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                }
+                
+                document.getElementById('detailContainer').style.display = 'block';
+            } else {
+                showAlert(data.message || 'Could not fetch order details', 'error');
+            }
+        } catch (e) {
+            console.error('Load details error:', e);
+            showAlert('Network error while loading details', 'error');
+        }
+    }
+
+    async function logout() {
+        try {
+            const res = await fetch('https://buildmarts.in/api/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            localStorage.removeItem('userSession');
+            window.location.href = 'login.html';
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    }
+
+    // Initialize
+    window.addEventListener('load', async () => {
+        const sellerId = await checkAuth();
+        if (sellerId) {
+            fetchOrders(sellerId);
+        }
+    });
+  </script>
+
+
+<!-- Scroll to Top Button -->
+<button id="scrollToTopBtn" style="display: none; position: fixed; bottom: 80px; right: 22px; z-index: 1000; background: linear-gradient(135deg, #3498db, #2980b9); color:white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 33px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s ease;" onclick="scrollToTop()">↑</button>
+
+<style>
+  #scrollToTopBtn:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  }
+</style>
+
+<script>
+  // Show/hide scroll to top button
+  window.addEventListener('scroll', function() {
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+    if (window.pageYOffset > 100) {
+      scrollToTopBtn.style.display = 'block';
+    } else {
+      scrollToTopBtn.style.display = 'none';
+    }
+  });
+
+  // Scroll to top function
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+</script>
+
+
+</body>
+</html>

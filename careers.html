@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers - BuildMarts</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        /* Coming Soon Section */
+        .coming-soon {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        
+        .coming-soon-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .coming-soon h2 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .coming-soon p {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 600px;
+            margin: 0 auto 1.5rem auto;
+        }
+        
+        .notification-box {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .notification-box h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .email-input {
+            display: flex;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 1.5rem auto 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .email-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            min-width: 250px;
+        }
+        
+        .email-input button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .email-input button:hover {
+            background: #2980b9;
+        }
+        
+        .why-join {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        
+        .why-join h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .why-join ul {
+            margin-left: 1.5rem;
+        }
+        
+        .why-join li {
+            margin-bottom: 0.75rem;
+            color: #555;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .benefit-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .benefit-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .benefit-card h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .benefit-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .contact-section {
+            text-align: center;
+            padding: 2rem;
+            background: #e8f4fd;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        
+        .contact-section h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-section p {
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-email {
+            font-size: 1.1rem;
+            color: #3498db;
+            font-weight: 500;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 1rem;
+            }
+            .content-card {
+                padding: 1rem;
+            }
+            .page-title {
+                font-size: 1.5rem;
+            }
+            .coming-soon {
+                padding: 2rem 1rem;
+            }
+            .coming-soon h2 {
+                font-size: 1.5rem;
+            }
+            .email-input {
+                flex-direction: column;
+            }
+            .email-input input,
+            .email-input button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Navbar Container -->
+    <div id="navbar-container">
+        <div class="loading">Loading navigation...</div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="page-container">
+        <div class="content-card">
+            <h1 class="page-title">Careers at BuildMarts</h1>
+            <p style="margin-top: 1rem; font-size: 1.1rem;">Join our team and help build the future of construction materials in India.</p>
+            
+            <!-- Coming Soon Message -->
+            <div class="coming-soon">
+                <div class="coming-soon-icon">🔨</div>
+                <h2>Openings Coming Soon!</h2>
+                <p>We're currently preparing exciting career opportunities at BuildMarts. Our team is growing, and we'll be hiring soon for various positions across multiple departments.</p>
+                <p style="font-weight: 500;">Stay tuned for updates!</p>
+            </div>
+            
+            <!-- Why Join Us Section -->
+            <div class="why-join">
+                <h3>🌟 Why Join BuildMarts?</h3>
+                <ul>
+                    <li><strong>Be Part of India's Growing Construction Industry</strong> - Work with a company that's shaping the future of construction materials</li>
+                    <li><strong>Innovative Work Environment</strong> - Join a team that values creativity, innovation, and new ideas</li>
+                    <li><strong>Professional Growth</strong> - Opportunities for learning, development, and career advancement</li>
+                    <li><strong>Collaborative Culture</strong> - Work with passionate professionals in a supportive environment</li>
+                    <li><strong>Make an Impact</strong> - Contribute to projects that matter and see real results</li>
+                </ul>
+            </div>
+            
+            <!-- Benefits Section -->
+            <h3 style="margin: 2rem 0 1rem 0; color: #2c3e50;">What We Offer</h3>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h4>Competitive Compensation</h4>
+                    <p>Attractive salary packages and performance-based incentives</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏥</div>
+                    <h4>Health Benefits</h4>
+                    <p>Comprehensive health insurance for you and your family</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📚</div>
+                    <h4>Learning & Development</h4>
+                    <p>Continuous learning opportunities and skill development programs</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏖️</div>
+                    <h4>Work-Life Balance</h4>
+                    <p>Flexible work arrangements and paid time off</p>
+                </div>
+            </div>
+            
+            <!-- Stay Updated Section -->
+            <div class="notification-box">
+                <h3>📧 Get Notified When We're Hiring</h3>
+                <p>Be the first to know about new job openings at BuildMarts.</p>
+                <div class="email-input">
+                    <input type="email" id="careerEmail" placeholder="Enter your email address">
+                    <button onclick="notifyMe()">Notify Me</button>
+                </div>
+                <p style="font-size: 0.8rem; color: #888; margin-top: 1rem;">We'll only contact you about career opportunities. No spam.</p>
+            </div>
+            
+            <!-- Contact Section -->
+            <div class="contact-section">
+                <h3>📬 Want to Connect?</h3>
+                <p>If you're passionate about the construction industry and would like to introduce yourself,</p>
+                <p>please send your resume and a brief introduction to:</p>
+                <p class="contact-email">careers@buildmarts.in</p>
+                <p style="font-size: 0.9rem; margin-top: 1rem;">We'll keep your information on file and reach out when relevant opportunities arise.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div id="footer-placeholder">
+        <div class="loading">Loading footer...</div>
+    </div>
+    
+    <!-- Navbar Load Script -->
+    <script>
+    async function includeNavbar() {
+        try {
+            const res = await fetch('navbar.html');
+            const text = await res.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            document.getElementById('navbar-container').innerHTML = doc.body.innerHTML;
+            
+            const __createdScriptPromises = [];
+            doc.querySelectorAll('script').forEach(s => {
+                const newScript = document.createElement('script');
+                if (s.src) {
+                    newScript.src = s.src;
+                    newScript.async = false;
+                    __createdScriptPromises.push(new Promise(resolve => {
+                        newScript.addEventListener('load', resolve);
+                        newScript.addEventListener('error', resolve);
+                        setTimeout(resolve, 2000);
+                    }));
+                } else {
+                    newScript.textContent = s.textContent;
+                }
+                document.body.appendChild(newScript);
+            });
+            Promise.all(__createdScriptPromises).finally(() => {
+                if (typeof setActiveNavLink === 'function') setActiveNavLink();
+            });
+        } catch (e) {
+            console.error('Failed to load navbar:', e);
+            document.getElementById('navbar-container').innerHTML = '<nav style="background:#333;color:white;padding:1rem;">Navigation unavailable</nav>';
+        }
+    }
+    includeNavbar();
+    </script>
+    
+    <!-- Footer Load Script -->
+    <script>
+        fetch('footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-placeholder').innerHTML = data;
+                const temp = document.createElement('div');
+                temp.innerHTML = data;
+                temp.querySelectorAll('script').forEach(s => {
+                    const newScript = document.createElement('script');
+                    if (s.src) {
+                        newScript.src = s.src;
+                    } else {
+                        newScript.textContent = s.textContent;
+                    }
+                    document.body.appendChild(newScript);
+                });
+            })
+            .catch(error => {
+                console.error('Footer load error:', error);
+                document.getElementById('footer-placeholder').innerHTML = '<footer style="background:#222;color:white;padding:1rem;text-align:center;">Footer unavailable</footer>';
+            });
+    </script>
+    
+    <!-- Notification Function -->
+    <script>
+        function notifyMe() {
+            const email = document.getElementById('careerEmail').value;
+            if (email && email.includes('@')) {
+                alert(`Thank you! We'll notify ${email} when new positions become available.`);
+                document.getElementById('careerEmail').value = '';
+            } else if (email) {
+                alert('Please enter a valid email address.');
+            } else {
+                alert('Please enter your email address to receive notifications.');
+            }
+        }
+    </script>
+</body>
+<!-- Load Chatbot -->
+<script>
+  async function loadChatbot() {
+    try {
+      const response = await fetch('./chatbot.html');
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const htmlContent = await response.text();
+      
+      // Create a container to hold chatbot
+      const container = document.createElement('div');
+      container.id = 'chatbot-container';
+      container.innerHTML = htmlContent;
+      document.body.appendChild(container);
+      
+      // Extract and re-execute scripts from chatbot.html
+      const scripts = container.querySelectorAll('script');
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        newScript.textContent = oldScript.textContent;
+        document.head.appendChild(newScript);
+      });
+      
+      console.log('✓ Chatbot loaded successfully');
+    } catch (error) {
+      console.error('✗ Chatbot load failed:', error);
+    }
+  }
+  
+  // Load chatbot when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadChatbot);
+  } else {
+    loadChatbot();
+  }
+</script>
+
+</html>
