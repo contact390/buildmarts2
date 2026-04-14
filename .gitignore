@@ -1,3 +1,4 @@
 .netlify
 .vercel
 .env
+node_modules/
