@@ -200,6 +200,16 @@
     function completeRegistration() {
       const passwordMessageEl = document.getElementById('passwordMessage');
       const passwordSection = document.getElementById('setPasswordSection');
+<<<<<<< HEAD
+=======
+
+      // Determine which message element to use based on visible section
+      const messageEl = passwordSection && passwordSection.style.display !== 'none' ? passwordMessageEl : document.getElementById('otpMessage');
+
+      messageEl.style.color = '#007BFF';
+      messageEl.innerText = '⏳ Completing registration...';
+      messageEl.style.display = 'block';
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 
       // Determine which message element to use based on visible section
       const messageEl = passwordSection && passwordSection.style.display !== 'none' ? passwordMessageEl : document.getElementById('otpMessage');

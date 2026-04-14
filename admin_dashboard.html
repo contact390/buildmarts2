@@ -173,10 +173,17 @@ async function loadDashboard() {
 try {
 
 // FETCH ALL DATA
+<<<<<<< HEAD
 const productsRes = await fetch('https://buildmarts.in/api/product_uploads');
 const ordersRes = await fetch('https://buildmarts.in/api/all-orders');
 const buyersRes = await fetch('https://buildmarts.in/api/buyer-profile');
 const sellersRes = await fetch('https://buildmarts.in/api/seller-profile');
+=======
+const productsRes = await fetch('http://localhost:5000/api/product_uploads');
+const ordersRes = await fetch('http://localhost:5000/api/all-orders');
+const buyersRes = await fetch('http://localhost:5000/api/buyer-profile');
+const sellersRes = await fetch('http://localhost:5000/api/seller-profile');
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 
 const products = await productsRes.json();
 const orders = await ordersRes.json();

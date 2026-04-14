@@ -77,7 +77,11 @@
 // ✅ LOAD PRODUCTS
 function loadProducts() {
 
+<<<<<<< HEAD
 fetch('https://buildmarts.in/api/product_uploads')
+=======
+fetch('http://localhost:5000/api/product_uploads')
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 .then(res => res.json())
 .then(data => {
 
@@ -128,7 +132,11 @@ function deleteProduct(id) {
 
 if (!confirm("Are you sure to delete?")) return;
 
+<<<<<<< HEAD
 fetch(`https://buildmarts.in/api/product_uploads/${id}`, {
+=======
+fetch(`http://localhost:5000/api/product_uploads/${id}`, {
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 method: 'DELETE'
 })
 .then(res => res.json())

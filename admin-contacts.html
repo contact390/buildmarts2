@@ -95,7 +95,11 @@ let allMessages = [];
 
 // LOAD ALL MESSAGES
 function loadMessages() {
+<<<<<<< HEAD
 fetch('https://buildmarts.in/api/contact_us')
+=======
+fetch('http://localhost:5000/api/contact_us')
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 .then(res => res.json())
 .then(data => {
   allMessages = data;
@@ -158,7 +162,11 @@ const email = document.getElementById("searchEmail").value;
 
 if (!email) return loadMessages();
 
+<<<<<<< HEAD
 fetch(`https://buildmarts.in/api/contact_us/${email}`)
+=======
+fetch(`http://localhost:5000/api/contact_us/${email}`)
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 .then(res => res.json())
 .then(data => {
   renderMessages(data);

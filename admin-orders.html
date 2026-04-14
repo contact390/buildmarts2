@@ -95,7 +95,11 @@ let currentOrder = null;
 
 // LOAD ORDERS
 function loadOrders() {
+<<<<<<< HEAD
 fetch('https://buildmarts.in/api/all-orders')
+=======
+fetch('http://localhost:5000/api/all-orders')
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 .then(res => res.json())
 .then(data => {
 
@@ -152,7 +156,11 @@ document.getElementById("ordersTable").innerHTML = html || `<tr><td colspan="7">
 // UPDATE STATUS
 function updateStatus(id, status) {
 
+<<<<<<< HEAD
 fetch(`https://buildmarts.in/api/update-order-status/${id}`, {
+=======
+fetch(`http://localhost:5000/api/update-order-status/${id}`, {
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 method: 'PUT',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify({ status })

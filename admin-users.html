@@ -87,7 +87,11 @@ let currentType = 'buyer';
 function loadBuyers() {
 currentType = 'buyer';
 
+<<<<<<< HEAD
 fetch('https://buildmarts.in/api/buyer-profile')
+=======
+fetch('http://localhost:5000/api/buyer-profile')
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 .then(res => res.json())
 .then(data => {
   currentUsers = data.buyers;
@@ -99,7 +103,11 @@ fetch('https://buildmarts.in/api/buyer-profile')
 function loadSellers() {
 currentType = 'seller';
 
+<<<<<<< HEAD
 fetch('https://buildmarts.in/api/seller-profile')
+=======
+fetch('http://localhost:5000/api/seller-profile')
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 .then(res => res.json())
 .then(data => {
   currentUsers = data.sellers;
@@ -165,7 +173,11 @@ document.getElementById("popup").style.display = "none";
 
 // APPROVE SELLER
 function approveSeller(id) {
+<<<<<<< HEAD
 fetch(`https://buildmarts.in/api/approve-seller/${id}`, {
+=======
+fetch(`http://localhost:5000/api/approve-seller/${id}`, {
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 method: 'PUT'
 })
 .then(() => {
@@ -176,7 +188,11 @@ loadSellers();
 
 // BLOCK USER
 function blockUser(id) {
+<<<<<<< HEAD
 fetch(`https://buildmarts.in/api/block-user/${currentType}/${id}`, {
+=======
+fetch(`http://localhost:5000/api/block-user/${currentType}/${id}`, {
+>>>>>>> 52933b69b3c37e96ef249e29772961808c103fdd
 method: 'PUT'
 })
 .then(() => {
