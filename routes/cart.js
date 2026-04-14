@@ -690,5 +690,17 @@ router.post("/test-email", (req, res) => {
     });
   });
 });
+router.put('/update-order-status/:id', (req, res) => {
+  const orderId = req.params.id;
+  const { status } = req.body;
 
+  const query = 'UPDATE orders SET status = ? WHERE id = ?';
+
+  db.query(query, [status, orderId], (err) => {
+    if (err) {
+      return res.status(500).json({ success: false });
+    }
+    res.json({ success: true, message: 'Status updated' });
+  });
+});
 module.exports = router;

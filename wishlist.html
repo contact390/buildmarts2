@@ -134,6 +134,7 @@
     <script>
         let wishlist = JSON.parse(localStorage.getItem('productWishlist')) || [];
         let wishlistProducts = [];
+        let wishlistQuantities = JSON.parse(localStorage.getItem('wishlistQuantities')) || {};
         
         // Cart functionality with proper initialization
         let cart = [];
@@ -218,7 +219,7 @@
 
             try {
                 // Fetch all products and filter by wishlist IDs
-                const response = await fetch('http://localhost:5000/api/product_uploads?limit=1000');
+                const response = await fetch('https://buildmarts.in/api/product_uploads?limit=1000');
                 const data = await response.json();
 
                 if (!data.success || !data.products) {
@@ -309,7 +310,7 @@
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:10px;">
                             <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:5px;">
                                 <button class="decrease-qty" style="border:none;background:#eee;padding:5px 10px;cursor:pointer;font-weight:bold;border-radius:4px 0 0 4px;" onclick="decreaseQty('qty-${product.id}')">-</button>
-                                <span class="quantity-display" id="qty-${product.id}" style="padding:5px 10px;min-width:30px;text-align:center;font-weight:bold;">1</span>
+                                <span class="quantity-display" id="qty-${product.id}" style="padding:5px 10px;min-width:30px;text-align:center;font-weight:bold;">${wishlistQuantities[product.id] || 1}</span>
                                 <button class="increase-qty" style="border:none;background:#eee;padding:5px 10px;cursor:pointer;font-weight:bold;border-radius:0 4px 4px 0;" onclick="increaseQty('qty-${product.id}')">+</button>
                             </div>
                           <button onclick='addToCartWithQty(${JSON.stringify(product).replace(/'/g, "\\'").replace(/"/g, '&quot;')}, document.getElementById("qty-${product.id}").textContent)' 
@@ -330,7 +331,7 @@
             let cartKey = localStorage.getItem('cart_key');
             if (!cartKey) {
                 try {
-                    const response = await fetch('http://localhost:5000/api/cart/create', { method: 'POST' });
+                    const response = await fetch('https://buildmarts.in/api/cart/create', { method: 'POST' });
                     const data = await response.json();
                     cartKey = data.cart_key;
                     if (cartKey) localStorage.setItem('cart_key', cartKey);
@@ -350,7 +351,7 @@
             }
             try {
                 const cartItem = { cart_key: cartKey, product_id: productId, name: name, price: price, image: image, qty: quantity };
-                const response = await fetch('http://localhost:5000/api/cart/add', { 
+                const response = await fetch('https://buildmarts.in/api/cart/add', { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify(cartItem) 
@@ -378,6 +379,10 @@
             let qty = parseInt(element.textContent);
             if (qty > 1) {
                 element.textContent = qty - 1;
+                // Extract product ID from element ID (format: qty-{productId})
+                const productId = elementId.replace('qty-', '');
+                wishlistQuantities[productId] = qty - 1;
+                localStorage.setItem('wishlistQuantities', JSON.stringify(wishlistQuantities));
             }
         }
 
@@ -386,6 +391,10 @@
             const element = document.getElementById(elementId);
             let qty = parseInt(element.textContent);
             element.textContent = qty + 1;
+            // Extract product ID from element ID (format: qty-{productId})
+            const productId = elementId.replace('qty-', '');
+            wishlistQuantities[productId] = qty + 1;
+            localStorage.setItem('wishlistQuantities', JSON.stringify(wishlistQuantities));
         }
 
         // Function to add to cart with quantity
@@ -407,7 +416,7 @@
             };
             
             try {
-                const API_BASE = (location.protocol === 'file:' || !location.hostname || location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api';
+                const API_BASE = (location.protocol === 'file:' || !location.hostname || location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'https://buildmarts.in/api' : '/api';
                 const resp = await fetch(API_BASE + '/cart/add', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -538,7 +547,7 @@
         async function viewProductDetails(productId) {
             console.log('viewProductDetails called', productId);
             try {
-                const API_BASE = (location.protocol === 'file:' || !location.hostname || location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api';
+                const API_BASE = (location.protocol === 'file:' || !location.hostname || location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'https://buildmarts.in/api' : '/api';
                 const response = await fetch(`${API_BASE}/product_uploads/${productId}`);
                 const data = await response.json();
 
@@ -663,6 +672,9 @@
             if (index > -1) {
                 wishlist.splice(index, 1);
                 localStorage.setItem('productWishlist', JSON.stringify(wishlist));
+                // Clean up the quantity data for this product
+                delete wishlistQuantities[productId];
+                localStorage.setItem('wishlistQuantities', JSON.stringify(wishlistQuantities));
                 showToast(`${productName} removed from wishlist!`, 'success');
                 loadWishlist();
             }
@@ -677,6 +689,8 @@
         function confirmClearWishlist() {
             wishlist = [];
             localStorage.setItem('productWishlist', JSON.stringify(wishlist));
+            wishlistQuantities = {};
+            localStorage.setItem('wishlistQuantities', JSON.stringify(wishlistQuantities));
             showToast('Wishlist cleared!', 'success');
             loadWishlist();
             document.getElementById('clearWishlistModal').style.display = 'none';

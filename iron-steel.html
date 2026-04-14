@@ -843,7 +843,7 @@
       document.getElementById('loadingContainer').style.display = 'block';
       try {
         const response = await fetch(
-          `http://localhost:5000/api/product_uploads/category/${CATEGORY}?limit=100`
+          `https://buildmarts.in/api/product_uploads/category/${CATEGORY}?limit=100`
         );
         const data = await response.json();
 
@@ -928,7 +928,7 @@
     async function viewProductDetails(productId) {
       console.log('viewProductDetails called', productId);
       try {
-        const API_BASE = (location.protocol === 'file:' || !location.hostname || location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api';
+        const API_BASE = (location.protocol === 'file:' || !location.hostname || location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'https://buildmarts.in/api' : '/api';
         const response = await fetch(`${API_BASE}/product_uploads/${productId}`);
         const data = await response.json();
 
@@ -1132,7 +1132,7 @@
 
     // ============ CART FUNCTIONS ============
 
-    const API_BASE = 'http://localhost:5000/api';
+    const API_BASE = 'https://buildmarts.in/api';
 
     async function getOrCreateCart() {
       let cartKey = localStorage.getItem('cart_key');

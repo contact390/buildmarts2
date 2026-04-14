@@ -117,6 +117,13 @@ router.get('/contact_us/:email', (req, res) => {
   });
 });
 
+router.delete('/contact_us/:id', (req, res) => {
+  const id = req.params.id;
 
+  db.query('DELETE FROM contact_messages WHERE id=?', [id], (err) => {
+    if (err) return res.status(500).json({ success:false });
+    res.json({ success:true });
+  });
+});
 
 module.exports = router;

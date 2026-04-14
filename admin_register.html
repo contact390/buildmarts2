@@ -190,7 +190,7 @@
         <div class="restricted" id="restricted" style="display: none;">
             🔒 Access Denied: You must be logged in as an admin to register new admins.
             <br><br>
-            <a href="http://localhost:5000/admin_login.html" style="color: #721c24;">← Back to Admin Login</a>
+            <a href="https://buildmarts.in/admin_login.html" style="color: #721c24;">← Back to Admin Login</a>
         </div>
         
         <form id="adminRegisterForm">
@@ -229,7 +229,7 @@
         </form>
         
         <div class="login-link">
-            <a href="http://localhost:5000/admin_login.html">← Back to Admin Login</a>
+            <a href="https://buildmarts.in/admin_login.html">← Back to Admin Login</a>
         </div>
     </div>
     
@@ -281,7 +281,7 @@
             try {
                 spinner.classList.add('show');
                 
-                const response = await fetch('http://localhost:5000/api/admin/register', {
+                const response = await fetch('https://buildmarts.in/api/admin/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -313,7 +313,7 @@
                     
                     // Redirect to dashboard after 1.5 seconds
                     setTimeout(() => {
-                        window.location.href = 'http://localhost:5000/admin_dashboard.html';
+                        window.location.href = 'https://buildmarts.in/admin_dashboard.html';
                     }, 1500);
                 } else {
                     messageDiv.className = 'message error';

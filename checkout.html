@@ -171,7 +171,7 @@ fetch('footer.html').then(r=>r.text()).then(d=>document.getElementById('footer-p
 <!-- main inline script (identical to original, but note: CSS moved inline) -->
 <script>
   // API Configuration
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = 'https://buildmarts.in/api';
   const FREE_DELIVERY_THRESHOLD = 1000;
   const COD_HANDLING_FEE = 50;
   const ONLINE_DISCOUNT = 0.02; // 2%
@@ -484,6 +484,7 @@ fetch('footer.html').then(r=>r.text()).then(d=>document.getElementById('footer-p
           renderOrderSummary(cartData.items);
         }
       });
+      
     });
   }
   
@@ -548,7 +549,7 @@ fetch('footer.html').then(r=>r.text()).then(d=>document.getElementById('footer-p
         if (typeof updateCartBadge === 'function') updateCartBadge();
         
         setTimeout(() => {
-          window.location.href = `http://localhost:5000/order-details.html?id=${data.orderId}`;
+          window.location.href = `https://buildmarts.in/order-details.html?id=${data.orderId}`;
         }, 3000);
         
       } else {

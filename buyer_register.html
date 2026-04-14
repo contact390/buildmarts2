@@ -16,22 +16,19 @@
     <h2 style="text-align:center;margin-bottom:20px;">Buyer Registration</h2>
 
     <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Name *</label>
-    <input type="text" id="name" style=" margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Full Name" required>
+    <input type="text" id="name" style=" margin-left: 12px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Full Name" required>
 
     <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Email *</label>
-    <input type="email" id="email" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="your@email.com" required>
+    <input type="email" id="email" style="margin-left: 12px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="your@email.com" required>
 
     <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Phone Number *</label>
-    <input type="tel" id="phone" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="10-digit number" required>
+    <input type="tel" id="phone" style="margin-left: 12px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="10-digit number" required>
 
     <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Address *</label>
-    <input type="text" id="address" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Your address" required>
-
-    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Password *</label>
-    <input type="password" id="password" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Min 6 characters" required>
+    <input type="text" id="address" style="margin-left: 12px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Your address" required>
 
     <div style="text-align:right;">
-      <button type="submit" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 10px;">Register</button>
+      <button type="submit" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 15px;">Register</button>
     </div>
 
     <p style="margin-top:15px;text-align:center;font-size:14px;">Already have an account?
@@ -50,10 +47,10 @@
     </p>
 
     <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Verification Code *</label>
-    <input type="text" id="otpInput" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Enter 6-digit OTP" maxlength="6" required>
+    <input type="text" id="otpInput" style="margin-left: 12px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Enter 6-digit OTP" maxlength="6" required>
 
     <div style="text-align:right;">
-      <button type="button" onclick="verifyOTP()" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 10px;">Verify OTP</button>
+      <button type="button" onclick="verifyOTP()" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 15px;">Verify OTP</button>
     </div>
 
     <p style="text-align:center;margin-top:15px;font-size:13px;">
@@ -61,6 +58,27 @@
     </p>
 
     <p id="otpMessage" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:14px;display:none;font-weight:bold;"></p>
+  </div>
+
+  <!-- Set Password Section -->
+  <div id="setPasswordSection" style="display:none;width:90%;max-width:360px;margin:10px auto 50px;background:#fff;padding:25px 20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center;margin-bottom:20px;">Set Your Password</h2>
+    
+    <p style="text-align:center;margin-bottom:15px;font-size:14px;color:#666;">
+      Create a secure password for your account.
+    </p>
+
+    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Password *</label>
+    <input type="password" id="passwordInput" style="margin-left: 12px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Min 6 characters" required>
+
+    <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Confirm Password *</label>
+    <input type="password" id="confirmPasswordInput" style="margin-left: 12px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Confirm password" required>
+
+    <div style="text-align:right;">
+      <button type="button" onclick="completePasswordSetup()" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 15px;">Set Password</button>
+    </div>
+
+    <p id="passwordMessage" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:14px;display:none;font-weight:bold;"></p>
   </div>
 
   <script>
@@ -74,11 +92,10 @@
       const email = document.getElementById('email').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
-      const password = document.getElementById('password').value;
       const messageEl = document.getElementById('message');
 
       // Validation
-      if (!name || !email || !phone || !address || !password) {
+      if (!name || !email || !phone || !address) {
         messageEl.style.color = 'red';
         messageEl.innerText = '❌ Please fill in all required fields.';
         messageEl.style.display = 'block';
@@ -93,15 +110,8 @@
         return;
       }
 
-      if (password.length < 6) {
-        messageEl.style.color = 'red';
-        messageEl.innerText = '❌ Password must be at least 6 characters long.';
-        messageEl.style.display = 'block';
-        return;
-      }
-
-      // Store registration data
-      registrationData = { name, email, phone, address, password };
+      // Store registration data (without password)
+      registrationData = { name, email, phone, address };
 
       // Send OTP
       sendOTPForRegistration(email, name);
@@ -113,7 +123,7 @@
       messageEl.innerText = '⏳ Sending verification code...';
       messageEl.style.display = 'block';
 
-      fetch('http://localhost:5000/api/send-otp', {
+      fetch('https://buildmarts.in/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name, userType: 'buyer' })
@@ -156,7 +166,7 @@
       otpMessageEl.innerText = '⏳ Verifying OTP...';
       otpMessageEl.style.display = 'block';
 
-      fetch('http://localhost:5000/api/verify-otp', {
+      fetch('https://buildmarts.in/api/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: registrationData.email, otp, userType: 'buyer' })
@@ -166,10 +176,13 @@
         if (data.success) {
           otpVerified = true;
           otpMessageEl.style.color = 'green';
-          otpMessageEl.innerText = '✅ OTP verified! Completing registration...';
+          otpMessageEl.innerText = '✅ OTP verified! Please set your password...';
           
-          // Proceed with actual registration
-          completeRegistration();
+          // Show password setup form
+          setTimeout(() => {
+            document.getElementById('otpSection').style.display = 'none';
+            document.getElementById('setPasswordSection').style.display = 'block';
+          }, 1500);
         } else {
           otpMessageEl.style.color = 'red';
           otpMessageEl.innerText = '❌ ' + (data.message || 'Invalid OTP');
@@ -185,10 +198,17 @@
     }
 
     function completeRegistration() {
-      const messageEl = document.getElementById('message');
-      const otpMessageEl = document.getElementById('otpMessage');
+      const passwordMessageEl = document.getElementById('passwordMessage');
+      const passwordSection = document.getElementById('setPasswordSection');
 
-      fetch('http://localhost:5000/api/buyer-profile', {
+      // Determine which message element to use based on visible section
+      const messageEl = passwordSection && passwordSection.style.display !== 'none' ? passwordMessageEl : document.getElementById('otpMessage');
+
+      messageEl.style.color = '#007BFF';
+      messageEl.innerText = '⏳ Completing registration...';
+      messageEl.style.display = 'block';
+
+      fetch('https://buildmarts.in/api/buyer-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -203,24 +223,24 @@
       .then(({ status, data }) => {
         console.log('📨 Response data:', data);
         
-        if (status === 200) {
-          otpMessageEl.style.color = 'green';
-          otpMessageEl.innerText = '✅ Registration successful! Redirecting to login...';
-          otpMessageEl.style.display = 'block';
+        if (status === 200 || data.success) {
+          messageEl.style.color = 'green';
+          messageEl.innerText = '✅ Registration successful! Redirecting to login...';
+          messageEl.style.display = 'block';
           setTimeout(() => {
             window.location.href = 'login.html';
           }, 2000);
         } else {
-          otpMessageEl.style.color = 'red';
-          otpMessageEl.innerText = '❌ ' + (data.error || data.message || 'Registration failed. Please try again.');
-          otpMessageEl.style.display = 'block';
+          messageEl.style.color = 'red';
+          messageEl.innerText = '❌ ' + (data.error || data.message || 'Registration failed. Please try again.');
+          messageEl.style.display = 'block';
         }
       })
       .catch(error => {
         console.error('❌ Error:', error);
-        otpMessageEl.style.color = 'red';
-        otpMessageEl.innerText = '❌ Error: Unable to complete registration.';
-        otpMessageEl.style.display = 'block';
+        messageEl.style.color = 'red';
+        messageEl.innerText = '❌ Error: Unable to complete registration. ' + error.message;
+        messageEl.style.display = 'block';
       });
     }
 
@@ -231,9 +251,43 @@
     function backToForm() {
       document.getElementById('registerForm').style.display = 'block';
       document.getElementById('otpSection').style.display = 'none';
+      document.getElementById('setPasswordSection').style.display = 'none';
       document.getElementById('otpInput').value = '';
       document.getElementById('otpMessage').style.display = 'none';
       otpVerified = false;
+    }
+
+    function completePasswordSetup() {
+      const password = document.getElementById('passwordInput').value;
+      const confirmPassword = document.getElementById('confirmPasswordInput').value;
+      const passwordMessageEl = document.getElementById('passwordMessage');
+
+      if (!password || !confirmPassword) {
+        passwordMessageEl.style.color = 'red';
+        passwordMessageEl.innerText = '❌ Please fill in all password fields.';
+        passwordMessageEl.style.display = 'block';
+        return;
+      }
+
+      if (password.length < 6) {
+        passwordMessageEl.style.color = 'red';
+        passwordMessageEl.innerText = '❌ Password must be at least 6 characters long.';
+        passwordMessageEl.style.display = 'block';
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        passwordMessageEl.style.color = 'red';
+        passwordMessageEl.innerText = '❌ Passwords do not match.';
+        passwordMessageEl.style.display = 'block';
+        return;
+      }
+
+      // Add password to registration data
+      registrationData.password = password;
+
+      // Proceed with actual registration
+      completeRegistration();
     }
   </script>
   

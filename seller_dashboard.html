@@ -13,7 +13,7 @@
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+background:linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
       padding: 20px;
     }
@@ -77,15 +77,22 @@
     }
     
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
     
-    .grid-2 {
+    /* Two column layout - left sidebar and right content */
+    .dashboard-layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 380px 1fr;
       gap: 25px;
-      margin-bottom: 25px;
+    }
+    
+    /* Left Sidebar Styles */
+    .left-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
     }
     
     .card {
@@ -117,7 +124,7 @@
     
     .quick-actions {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: 1fr;
       gap: 12px;
       margin-top: 15px;
     }
@@ -133,7 +140,7 @@
       transition: all 0.3s ease;
       text-align: center;
       text-decoration: none;
-      display: inline-block;
+      display: block;
     }
     
     .action-btn:hover {
@@ -161,8 +168,312 @@
       margin-top: 5px;
     }
     
-    @media (max-width: 768px) {
-      .grid-2 {
+    /* Right Side - Products Section */
+    .right-content {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 25px;
+      min-height: 500px;
+    }
+    
+    .right-content h3 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .product-count-badge {
+      background: #667eea;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .products-grid::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .products-grid::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    .products-grid::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 10px;
+    }
+    
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      border-color: #667eea;
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 150px;
+      background: #f0f0f0;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .product-image .no-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #999;
+      font-size: 14px;
+    }
+    
+    .product-name {
+      margin: 8px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .product-price {
+      margin: 5px 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #667eea;
+    }
+    
+    .product-status {
+      margin: 5px 0;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .product-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+      gap: 8px;
+    }
+
+    .btn-edit {
+      border: none;
+      background: #2d3748;
+      color: #fff;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s ease;
+    }
+
+    .btn-edit:hover {
+      background: #1a202c;
+    }
+
+    .edit-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+
+    .edit-modal.open {
+      display: flex;
+    }
+
+    .edit-modal-content {
+      width: min(960px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .edit-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: #ff4757;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .edit-modal h3 {
+      margin-bottom: 18px;
+      color: #333;
+      font-size: 24px;
+    }
+
+    .edit-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .edit-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .edit-form-group label {
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .edit-form-group input,
+    .edit-form-group textarea,
+    .edit-form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      color: #333;
+      background: #f9fafb;
+      outline: none;
+    }
+
+    .edit-form-group textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .edit-form-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .edit-form-submit {
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 22px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .edit-form-submit:hover {
+      background: #5568d3;
+    }
+
+    .edit-form-secondary {
+      background: transparent;
+      color: #333;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 12px 22px;
+      cursor: pointer;
+    }
+
+    .edit-modal-preview {
+      border-radius: 12px;
+      background: #f3f4f6;
+      padding: 14px;
+      text-align: center;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+    }
+
+    .edit-modal-preview img {
+      max-width: 100%;
+      max-height: 180px;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .edit-modal-message {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #1f2937;
+      min-height: 20px;
+    }
+
+    .no-products {
+      text-align: center;
+      padding: 60px 30px;
+      color: #666;
+    }
+    
+    .no-products p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    
+    .upload-link {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 10px 20px;
+      border: 2px solid #667eea;
+      border-radius: 6px;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+    
+    .upload-link:hover {
+      background: #667eea;
+      color: white;
+    }
+    
+    @media (max-width: 968px) {
+      .dashboard-layout {
         grid-template-columns: 1fr;
       }
       
@@ -189,72 +500,148 @@
       </div>
     </div>
     
-    <!-- Welcome Section -->
-    <div class="grid-2">
-      <div class="card">
-        <h3>📊 Welcome, <span id="sellerName">Seller</span>!</h3>
-        <div class="welcome-msg">Welcome to your seller dashboard</div>
-        <div class="user-type">🎯 Account Type: Seller</div>
-        <div style="margin-top: 15px;">
-          <p style="color: #666; font-size: 14px; margin-bottom: 10px;">Email: <strong id="sellerEmail">loading...</strong></p>
-          <p style="color: #666; font-size: 14px;">Member Since: <strong id="memberSince">loading...</strong></p>
+    <!-- Two Column Layout -->
+    <div class="dashboard-layout">
+      
+      <!-- LEFT SIDEBAR - Welcome, Quick Actions, Stats -->
+      <div class="left-sidebar">
+        
+        <!-- Welcome Card -->
+        <div class="card">
+          <h3>📊 Welcome!</h3>
+          <div class="welcome-msg">Hello, <strong id="sellerName">Seller</strong>!</div>
+          <div class="user-type">🎯 Account Type: Seller</div>
+          <div style="margin-top: 15px;">
+            <p style="color: #666; font-size: 14px; margin-bottom: 10px;">📧 Email: <strong id="sellerEmail">loading...</strong></p>
+            <p style="color: #666; font-size: 14px;">📅 Member Since: <strong id="memberSince">loading...</strong></p>
+          </div>
+        </div>
+        
+        <!-- Quick Actions Card -->
+        <div class="card">
+          <h3>⚡ Quick Actions</h3>
+          <div class="quick-actions">
+            <a href="productslatestuploads.html" class="action-btn">📤 Upload Product</a>
+            <a href="manage_stock.html" class="action-btn">📦 Manage Stock</a>
+            <a href="seller_orders.html" class="action-btn">📋 View Orders</a>
+            <a href="seller_profile.html" class="action-btn">👤 Edit Profile</a>
+          </div>
+        </div>
+        
+        <!-- Store Statistics Card -->
+        <div class="card">
+          <h3>📈 Store Statistics</h3>
+          <div class="stat">
+            <div class="stat-number" id="statsProducts">0</div>
+            <div class="stat-label">Products Listed</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number" id="statsOrders">0</div>
+            <div class="stat-label">Total Orders</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number" id="statsSales">₹0</div>
+            <div class="stat-label">Total Sales</div>
+          </div>
+        </div>
+        
+        <!-- Performance Card -->
+        <div class="card">
+          <h3>⭐ Performance</h3>
+          <div class="stat">
+            <div class="stat-number">5.0</div>
+            <div class="stat-label">Average Rating</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">98%</div>
+            <div class="stat-label">Positive Feedback</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">24h</div>
+            <div class="stat-label">Avg Response Time</div>
+          </div>
         </div>
       </div>
       
-      <div class="card">
-        <h3>⚡ Quick Actions</h3>
-        <div class="quick-actions">
-         <a href="productslatestuploads.html" class="action-btn">📤 Upload Product</a>
-         <a href="manage_stock.html" class="action-btn">📦 Manage Stock</a>
-         <a href="seller_orders.html" class="action-btn">📋 View Orders</a>
-         <a href="seller_profile.html" class="action-btn">👤 Edit Profile</a>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Stats Section -->
-    <div class="grid-2">
-      <div class="card">
-        <h3>📈 Store Statistics</h3>
-        <div class="stat">
-          <div class="stat-number" id="statsProducts">0</div>
-          <div class="stat-label">Products Listed</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number" id="statsOrders">0</div>
-          <div class="stat-label">Total Orders</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number" id="statsSales">₹0</div>
-          <div class="stat-label">Total Sales</div>
+      <!-- RIGHT SIDE - Products Section Only -->
+      <div class="right-content">
+        <h3>
+          📦 Your Products
+          <span class="product-count-badge" id="productCount">0</span>
+        </h3>
+        <div id="productsList" class="products-grid"></div>
+        <div id="noProducts" class="no-products" style="display: none;">
+          <p>📭 No products uploaded yet.</p>
+          <a href="productslatestuploads.html" class="upload-link">Upload your first product →</a>
         </div>
       </div>
       
-      <div class="card">
-        <h3>⭐ Performance</h3>
-        <div class="stat">
-          <div class="stat-number">5.0</div>
-          <div class="stat-label">Average Rating</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">98%</div>
-          <div class="stat-label">Positive Feedback</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">24h</div>
-          <div class="stat-label">Avg Response Time</div>
-        </div>
-      </div>
     </div>
+  </div>
 
-    <!-- Products Section -->
-    <div class="card">
-      <h3>📦 Your Products</h3>
-      <div id="productsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;"></div>
-      <div id="noProducts" style="text-align: center; padding: 30px; color: #666;">
-        <p>📭 No products uploaded yet.</p>
-        <a href="productslatestuploads.html" style="color: #667eea; text-decoration: none; font-weight: 600;">Upload your first product →</a>
-      </div>
+  <div id="editModal" class="edit-modal" aria-hidden="true">
+    <div class="edit-modal-content">
+      <button id="editModalClose" class="edit-modal-close" type="button" aria-label="Close">×</button>
+      <h3>Edit Product</h3>
+      <form id="editProductForm">
+        <div class="edit-form-grid">
+          <div class="edit-form-group">
+            <label for="productName">Product Name</label>
+            <input id="productName" name="productName" type="text" required />
+          </div>
+          <div class="edit-form-group">
+            <label for="brand">Brand</label>
+            <input id="brand" name="brand" type="text" />
+          </div>
+          <div class="edit-form-group">
+            <label for="category">Category</label>
+            <input id="category" name="category" type="text" />
+          </div>
+          <div class="edit-form-group">
+            <label for="price">Price</label>
+            <input id="price" name="price" type="number" step="0.01" min="0" />
+          </div>
+          <div class="edit-form-group">
+            <label for="discount">Discount (%)</label>
+            <input id="discount" name="discount" type="number" step="0.01" min="0" />
+          </div>
+          <div class="edit-form-group">
+            <label for="quantity">Quantity</label>
+            <input id="quantity" name="quantity" type="number" step="1" min="0" />
+          </div>
+          <div class="edit-form-group">
+            <label for="quantityUnit">Quantity Unit</label>
+            <input id="quantityUnit" name="quantityUnit" type="text" />
+          </div>
+          <div class="edit-form-group">
+            <label for="color">Color</label>
+            <input id="color" name="color" type="text" />
+          </div>
+          <div class="edit-form-group">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="edit-form-group" style="grid-column: 1 / -1;">
+            <label for="description">Description</label>
+            <textarea id="description" name="description"></textarea>
+          </div>
+          <div class="edit-form-group" style="grid-column: 1 / -1;">
+            <label for="image">Product Image</label>
+            <input id="image" name="image" type="file" accept="image/*" />
+          </div>
+          <div class="edit-form-group" style="grid-column: 1 / -1;">
+            <div class="edit-modal-preview" id="editImagePreview">Image preview will appear here</div>
+          </div>
+        </div>
+        <div class="edit-form-footer">
+          <button type="button" id="cancelEdit" class="edit-form-secondary">Cancel</button>
+          <button type="submit" class="edit-form-submit">Save Changes</button>
+        </div>
+        <div id="editModalMessage" class="edit-modal-message"></div>
+      </form>
     </div>
   </div>
 
@@ -263,11 +650,13 @@
     let sellerProducts = [];
 
     // Attempt to populate session from server if not already in localStorage
+    const API_BASE = `${window.location.protocol}//${window.location.hostname}:5000/api`;
+
     async function syncSession() {
       let userSession = localStorage.getItem('userSession');
       if (!userSession) {
         try {
-          const res = await fetch('http://localhost:5000/api/me', { method: 'GET', credentials: 'include' });
+          const res = await fetch(`${API_BASE}/me`, { method: 'GET', credentials: 'include' });
           const result = await res.json();
           if (result.success && result.user) {
             const u = result.user;
@@ -308,7 +697,7 @@
         return;
       }
       
-      // Store seller ID for later use (accept both id and userId keys)
+      // Store seller ID
       currentSellerId = user.id || user.userId || user.seller_id || null;
       
       // Update navbar and display
@@ -320,7 +709,7 @@
       const memberDate = new Date(user.loginTime);
       document.getElementById('memberSince').textContent = memberDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
       
-      // Fetch seller's products (only if we have an ID)
+      // Fetch seller's products
       if (currentSellerId) {
         fetchSellerProducts(currentSellerId);
       } else {
@@ -331,28 +720,36 @@
     // Fetch products for this seller
     async function fetchSellerProducts(sellerId) {
       try {
-        const response = await fetch(`http://localhost:5000/api/product_uploads/seller/${sellerId}`);
+        const response = await fetch(`${API_BASE}/product_uploads/seller/${sellerId}`, { credentials: 'include' });
         const data = await response.json();
         
         if (data.success) {
           sellerProducts = data.products || [];
-          // Update product count
-          document.getElementById('statsProducts').textContent = data.total || 0;
+          // Update product count in stats and badge
+          const productCount = data.total || 0;
+          document.getElementById('statsProducts').textContent = productCount;
+          document.getElementById('productCount').textContent = productCount;
           
           // Display products
           displaySellerProducts(sellerProducts);
         } else {
           console.error('Failed to fetch products:', data.error);
           document.getElementById('statsProducts').textContent = '0';
-          document.getElementById('productsList').innerHTML = '';
-          document.getElementById('noProducts').style.display = 'block';
+          document.getElementById('productCount').textContent = '0';
+          showNoProducts();
         }
       } catch (error) {
         console.error('Error fetching seller products:', error);
         document.getElementById('statsProducts').textContent = '0';
-        document.getElementById('productsList').innerHTML = '';
-        document.getElementById('noProducts').style.display = 'block';
+        document.getElementById('productCount').textContent = '0';
+        showNoProducts();
       }
+    }
+    
+    // Show no products message
+    function showNoProducts() {
+      document.getElementById('productsList').innerHTML = '';
+      document.getElementById('noProducts').style.display = 'block';
     }
     
     // Display seller products
@@ -368,21 +765,155 @@
       
       noProducts.style.display = 'none';
       
-      productsList.innerHTML = products.map(product => `
-        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; background: #f9f9f9; cursor: pointer; transition: all 0.3s;" onclick="goToProductEdit(${product.id})">
-          <div style="width: 100%; height: 120px; background: #f0f0f0; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
-            ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${product.productName}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">No Image</div>'}
+      productsList.innerHTML = products.map(product => {
+        const productId = product.id || product.product_id || 0;
+        const imageUrl = product.imageUrl || product.image || '';
+        const name = product.productName || product.name || 'Untitled Product';
+        const price = parseFloat(product.finalPrice || product.price || 0).toFixed(2);
+        const status = product.status || '● Active';
+
+        return `
+          <div class="product-card" data-product-id="${productId}">
+            <div class="product-image">
+              ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(name)}">` : '<div class="no-image">📷 No Image</div>'}
+            </div>
+            <div class="product-name">${escapeHtml(name)}</div>
+            <div class="product-price">₹${price}</div>
+            <div class="product-status">${escapeHtml(status)}</div>
+            <div class="product-actions">
+              <button class="btn-edit" type="button" data-product-id="${productId}">✏️ Edit</button>
+            </div>
           </div>
-          <h4 style="margin: 8px 0; font-size: 14px; color: #333;">${product.productName}</h4>
-          <p style="margin: 5px 0; font-size: 12px; color: #666;">₹${parseFloat(product.finalPrice).toFixed(2)}</p>
-          <p style="margin: 5px 0; font-size: 12px; color: #999;">${product.status || 'active'}</p>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
     
-    // Edit product (placeholder function)
+    // Escape HTML to prevent XSS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      });
+    }
+    
+    let currentEditProductId = null;
+
+    function openEditModal(productId) {
+      currentEditProductId = productId;
+      const modal = document.getElementById('editModal');
+      const form = document.getElementById('editProductForm');
+      const message = document.getElementById('editModalMessage');
+      const preview = document.getElementById('editImagePreview');
+
+      message.textContent = '';
+      preview.innerHTML = 'Loading preview...';
+      modal.classList.add('open');
+
+      fetch(`${API_BASE}/product_uploads/${productId}`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success || !data.product) {
+            throw new Error(data.error || 'Unable to load product details');
+          }
+
+          const product = data.product;
+          form.productName.value = product.productName || '';
+          form.brand.value = product.brand || '';
+          form.category.value = product.category || '';
+          form.price.value = product.price || '';
+          form.discount.value = product.discount || '';
+          form.quantity.value = product.quantity || '';
+          form.quantityUnit.value = product.quantityUnit || '';
+          form.description.value = product.description || '';
+          form.color.value = product.color || '';
+          form.status.value = product.status || 'active';
+
+          preview.innerHTML = product.imageUrl ? `<img src="${product.imageUrl}" alt="Product image">` : '<div>No image available</div>';
+        })
+        .catch(error => {
+          console.error('Edit modal load failure:', error);
+          message.textContent = 'Could not load product details. Please try again later.';
+          preview.innerHTML = '<div>Unable to preview image</div>';
+        });
+    }
+
+    function closeEditModal() {
+      const modal = document.getElementById('editModal');
+      const form = document.getElementById('editProductForm');
+      modal.classList.remove('open');
+      document.getElementById('editModalMessage').textContent = '';
+      form.reset();
+      document.getElementById('editImagePreview').innerHTML = 'Image preview will appear here';
+    }
+
+    function saveEditMessage(message, isError = false) {
+      const messageEl = document.getElementById('editModalMessage');
+      messageEl.textContent = message;
+      messageEl.style.color = isError ? '#b91c1c' : '#1f2937';
+    }
+
+    document.getElementById('editModalClose').addEventListener('click', closeEditModal);
+    document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
+    document.getElementById('image').addEventListener('change', event => {
+      const preview = document.getElementById('editImagePreview');
+      const file = event.target.files[0];
+      if (!file) {
+        preview.innerHTML = 'Image preview will appear here';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        preview.innerHTML = `<img src="${reader.result}" alt="Preview">`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('editProductForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!currentEditProductId) {
+        saveEditMessage('Product ID missing. Please reopen the form.', true);
+        return;
+      }
+
+      const form = event.target;
+      const formData = new FormData(form);
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+      saveEditMessage('');
+
+      try {
+        const response = await fetch(`${API_BASE}/product_uploads/${currentEditProductId}`, {
+          method: 'PUT',
+          credentials: 'include',
+          body: formData
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Unable to save product');
+        }
+
+        saveEditMessage('Product updated successfully.');
+        await fetchSellerProducts(currentSellerId);
+        setTimeout(() => {
+          closeEditModal();
+        }, 1200);
+      } catch (error) {
+        console.error('Product update failed:', error);
+        saveEditMessage(error.message || 'Update failed. Please try again.', true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Changes';
+      }
+    });
+
+    // Edit product
     function goToProductEdit(productId) {
-      alert('Product editing coming soon: ' + productId);
+      openEditModal(productId);
     }
     
     // Go to seller profile
@@ -407,6 +938,26 @@
     
     // Setup logout button
     document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+
+    // Delegate clicks on product cards and edit buttons
+    document.getElementById('productsList').addEventListener('click', event => {
+      const editButton = event.target.closest('.btn-edit');
+      if (editButton) {
+        const productId = editButton.dataset.productId;
+        if (productId) {
+          openEditModal(productId);
+        }
+        return;
+      }
+
+      const card = event.target.closest('.product-card');
+      if (!card) return;
+
+      const productId = card.dataset.productId;
+      if (!productId) return;
+
+      goToProductEdit(productId);
+    });
     
     // Load info on page load
     window.addEventListener('load', loadSellerInfo);

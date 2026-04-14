@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amazon-style Product Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #f0f2f5;
+      color: #0f1111;
+      line-height: 1.5;
+    }
+    .amazon-container {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 20px 18px;
+    }
+    /* Amazon-style breadcrumb */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #565959;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .breadcrumb a {
+      color: #565959;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      color: #c45500;
+      text-decoration: underline;
+    }
+    .breadcrumb .separator {
+      color: #dddddd;
+      font-size: 12px;
+    }
+    /* main grid: left gallery + center details + right buy box */
+    .product-grid {
+      display: grid;
+      grid-template-columns: 40px 380px 1fr 280px;
+      gap: 20px;
+      align-items: start;
+    }
+    /* vertical thumbnail strip */
+    .thumbnail-strip {
+      display: flex;
+ flex-direction: column;
+      gap: 8px;
+    }
+    .thumb-item {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .thumb-item.active {
+      border: 2px solid #007185;
+      box-shadow: 0 0 3px 0 #007185;
+    }
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* main image area */
+    .main-image-area {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .main-image-container {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+    }
+    .main-image-container img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .badge-group {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      gap: 8px;
+    }
+    .badge-amazon-choice {
+      background: #232f3e;
+      color: white;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-deal {
+      background: #b12704;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 2px;
+    }
+    .limited-time {
+      background: #cc0c39;
+      color: white;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 2px;
+      margin-top: 4px;
+    }
+    /* right buy box */
+    .buy-box {
+      background: white;
+      border-radius: 8px;
+      padding: 14px 18px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 1px 4px 0 rgba(0,0,0,0.08);
+    }
+    .price-section {
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+    .mrp {
+      color: #565959;
+      font-size: 14px;
+    }
+    .price-large {
+      font-size: 28px;
+      font-weight: 500;
+      color: #0f1111;
+    }
+    .price-large sup {
+      font-size: 14px;
+      top: -0.4em;
+    }
+    .save-percent {
+      color: #cc0c39;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .tax-info {
+      color: #565959;
+      font-size: 14px;
+      margin: 4px 0;
+    }
+    .delivery-box {
+      padding: 12px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .delivery-row {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .delivery-badge {
+      background: #f0f2f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .stock-status {
+      color: #007600;
+      font-size: 18px;
+      font-weight: 500;
+      margin: 8px 0;
+    }
+    .fulfilled-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #f0f2f5;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      gap: 4px;
+    }
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0;
+      padding: 8px 0;
+    }
+    .quantity-selector select {
+      background: #f0f2f5;
+      border: 1px solid #d5d9d9;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+    .btn-amazon-primary {
+      background: #ffd814;
+      border: none;
+      border-radius: 30px;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin: 8px 0;
+    }
+    .btn-amazon-primary:hover {
+      background: #f7ca00;
+    }
+    .btn-amazon-secondary {
+      background: #ffa41c;
+      border: none;
+      border-radius: 30px;
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-amazon-secondary:hover {
+      background: #fa8900;
+    }
+    .secure-transaction {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #565959;
+      margin: 12px 0;
+      padding: 8px 0;
+      border-top: 1px solid #e0e0e0;
+    }
+    /* center details column */
+    .product-details-col h1 {
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    .stars {
+      color: #ffa41c;
+    }
+    .reviews-link {
+      color: #007185;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .amazons-choice {
+      background: #232f3e;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .deal-badge-large {
+      background: #b12704;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+      display: inline-block;
+      margin: 12px 0;
+    }
+    .feature-bullets {
+      margin: 20px 0;
+    }
+    .feature-bullets h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .feature-bullets ul {
+      list-style: none;
+    }
+    .feature-bullets li {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .feature-bullets li i {
+      color: #007600;
+      font-size: 14px;
+      margin-top: 3px;
+    }
+    .product-info-specs {
+      background: #f7f8f8;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .spec-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .spec-label {
+      color: #565959;
+    }
+    .freq-bought {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 20px 0;
+    }
+    .freq-bought h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    .freq-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .freq-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+    .freq-price {
+      margin-left: auto;
+      font-weight: 500;
+    }
+    /* customer reviews */
+    .reviews-section {
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+    }
+    .reviews-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .rating-large {
+      font-size: 48px;
+      font-weight: 500;
+    }
+    .review-card {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 16px 0;
+    }
+    .reviewer {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .review-stars {
+      color: #ffa41c;
+      margin: 4px 0;
+    }
+    .review-text {
+      font-size: 14px;
+      color: #0f1111;
+    }
+    .ai-generated {
+      background: #f0f2f5;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #565959;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #232f3e;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div class="amazon-container">
+    <!-- breadcrumb -->
+    <div class="breadcrumb">
+      <a href="#">Home</a><span class="separator">›</span>
+      <a href="#">Lighting & Ceiling Fans</a><span class="separator">›</span>
+      <a href="#">Lamps & Shades</a><span class="separator">›</span>
+      <span>One94Store 3D Engraved Deer Crystal Globe Lamp</span>
+    </div>
+
+    <!-- main product grid -->
+    <div class="product-grid">
+      <!-- column 1: thumbnails -->
+      <div class="thumbnail-strip">
+        <div class="thumb-item active"><img src="https://m.media-amazon.com/images/I/61XjQ1O9PvL._SX522_.jpg" alt="thumb"></div>
+        <div class="thumb-item"><img src="https://m.media-amazon.com/images/I/71L5fM01O+L._SX522_.jpg" alt="thumb"></div>
+        <div class="thumb-item"><img src="https://m.media-amazon.com/images/I/71L5fM01O+L._SX522_.jpg" alt="thumb"></div>
+        <div class="thumb-item"><img src="https://m.media-amazon.com/images/I/71L5fM01O+L._SX522_.jpg" alt="thumb"></div>
+        <div class="thumb-item"><img src="https://m.media-amazon.com/images/I/71L5fM01O+L._SX522_.jpg" alt="thumb"></div>
+      </div>
+
+      <!-- column 2: main image -->
+      <div class="main-image-area">
+        <div class="main-image-container">
+          <img src="https://m.media-amazon.com/images/I/61XjQ1O9PvL._SX522_.jpg" alt="Product main">
+          <div class="badge-group">
+            <span class="badge-amazon-choice"><i class="fas fa-check-circle"></i> Amazon's Choice</span>
+            <span class="badge-deal">Limited time deal</span>
+          </div>
+        </div>
+        <div style="padding: 8px; font-size: 13px; color: #565959;">
+          <i class="fas fa-video"></i> Roll over image to zoom in
+        </div>
+      </div>
+
+      <!-- column 3: product details -->
+      <div class="product-details-col">
+        <h1>One94Store 3D Engraved Deer Crystal Globe Lamp | USB LED Night Light with Wooden Base | Creative 6 cm Crystal Ball Table Lamp for Bedroom, Home, Office Décor & Gifting (Warm White)</h1>
+        
+        <div class="brand-row">
+          <span>Brand: <strong>One94Store</strong></span>
+          <span class="stars">★★★★½</span>
+          <a href="#" class="reviews-link">2,345 ratings</a>
+          <span class="amazons-choice">Amazon's Choice</span>
+        </div>
+
+        <!-- price area (inline) -->
+        <div style="background: #f7f8f8; padding: 12px; border-radius: 8px; margin: 12px 0;">
+          <span class="deal-badge-large">-80% ₹198.00</span>
+          <span style="text-decoration: line-through; color: #565959; margin-left: 12px;">M.R.P.: ₹999.00</span>
+          <span style="color: #cc0c39; font-size: 14px; margin-left: 12px;">Inclusive of all taxes</span>
+        </div>
+
+        <!-- offers -->
+        <div style="margin: 12px 0; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px;">
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <i class="fas fa-tag" style="color: #b12704;"></i>
+            <span style="font-weight: 700;">Offers</span>
+          </div>
+          <div style="margin-top: 8px; font-size: 14px;">
+            <i class="fas fa-circle" style="font-size: 6px; vertical-align: middle; color: #b12704; margin-right: 6px;"></i>
+            <span>Pay on Delivery (Cash/Card) available</span>
+          </div>
+        </div>
+
+        <!-- replacement / warranty box -->
+        <div style="display: flex; gap: 20px; margin: 16px 0; font-size: 14px;">
+          <div><i class="fas fa-undo-alt" style="color: #007185;"></i> 10 days Replacement</div>
+          <div><i class="fas fa-truck" style="color: #007185;"></i> Amazon Delivered</div>
+          <div><i class="fas fa-medal" style="color: #007185;"></i> Top Brand</div>
+        </div>
+
+        <!-- About this item -->
+        <div class="feature-bullets">
+          <h3>About this item</h3>
+          <ul>
+            <li><i class="fas fa-check"></i> Package Contain: 1x 3D Deer Crystal Desk Lamp, USB Cable, User Manual (Warm White Color)</li>
+            <li><i class="fas fa-check"></i> 🌲 Magical 3D Deer Forest Design – Crafted with precision using 3D laser engraving technology</li>
+            <li><i class="fas fa-check"></i> 💡 Soft Warm White LED Lighting – 6 warm white LEDs, flicker-free, eye comfort</li>
+            <li><i class="fas fa-check"></i> 🔌 USB-Powered – No batteries required, plug and play</li>
+            <li><i class="fas fa-check"></i> Elegant Wooden Touch Base – 2 cm wooden base, premium K10 crystal ball</li>
+          </ul>
+        </div>
+
+        <!-- product information table (condensed) -->
+        <div class="product-info-specs">
+          <div class="spec-row"><span class="spec-label">Finish Type</span><span>Lacquered</span></div>
+          <div class="spec-row"><span class="spec-label">Base Material</span><span>Wood</span></div>
+          <div class="spec-row"><span class="spec-label">Bulb Base</span><span>E5</span></div>
+          <div class="spec-row"><span class="spec-label">Dimensions</span><span>6D x 6W x 8H cm</span></div>
+          <div class="spec-row"><span class="spec-label">Weight</span><span>200g</span></div>
+          <div class="spec-row"><span class="spec-label">Lamp Type</span><span>Desk Lamp</span></div>
+        </div>
+
+        <!-- Frequently bought together (simplified) -->
+        <div class="freq-bought">
+          <h3>Frequently bought together</h3>
+          <div class="freq-item">
+            <img src="https://m.media-amazon.com/images/I/61XjQ1O9PvL._SX522_.jpg" alt="item">
+            <span>One94Store 3D Deer Lamp</span>
+            <span class="freq-price">₹198.00</span>
+          </div>
+          <div style="margin-top: 8px; color: #007185;">+ Add both to Cart</div>
+        </div>
+      </div>
+
+      <!-- column 4: buy box -->
+      <div>
+        <div class="buy-box">
+          <div class="price-section">
+            <div class="mrp">M.R.P.: <span style="text-decoration: line-through;">₹999.00</span></div>
+            <div><span class="price-large"><sup>₹</sup>198.00</span> <span class="save-percent">(80% off)</span></div>
+            <div class="tax-info">Inclusive of all taxes</div>
+          </div>
+
+          <div class="delivery-box">
+            <div class="delivery-row">
+              <i class="fas fa-check-circle" style="color: #007600;"></i>
+              <span><strong>FREE delivery</strong> Saturday, 28 February</span>
+            </div>
+            <div class="delivery-row">
+              <i class="fas fa-clock" style="color: #595959;"></i>
+              <span>Or fastest delivery Tomorrow, 27 February. Order within 9 hrs 56 mins</span>
+            </div>
+            <div style="margin-top: 12px;">
+              <span class="stock-status">In stock</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin: 8px 0;">
+              <span class="fulfilled-badge"><i class="fas fa-check-circle" style="color: #007600;"></i> Fulfilled</span>
+              <span class="fulfilled-badge"><i class="fas fa-amazon"></i> Amazon Delivered</span>
+            </div>
+          </div>
+
+          <!-- quantity & buttons -->
+          <div class="quantity-selector">
+            <label>Quantity:</label>
+            <select>
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+          </div>
+
+          <button class="btn-amazon-primary" onclick="addToCart()"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+          <button class="btn-amazon-secondary" onclick="buyNow()">Buy Now</button>
+
+          <div class="secure-transaction">
+            <i class="fas fa-lock" style="color: #007600;"></i>
+            <span>Secure transaction</span>
+            <i class="fas fa-chevron-right" style="margin-left: auto; font-size: 12px;"></i>
+          </div>
+
+          <div style="font-size: 12px; color: #565959; border-top: 1px solid #e0e0e0; padding-top: 12px; margin-top: 8px;">
+            <i class="fas fa-exchange-alt"></i> 10 days Replacement | <i class="fas fa-shield-alt"></i> Amazon Pay
+          </div>
+        </div>
+
+        <!-- seller info box -->
+        <div style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; margin-top: 16px;">
+          <div style="font-size: 14px;"><span style="font-weight: 700;">Sold by:</span> X4Cart</div>
+          <div style="font-size: 14px; margin-top: 4px;"><span style="font-weight: 700;">Returns:</span> 10 days replacement</div>
+          <div style="font-size: 14px; margin-top: 4px;"><span style="font-weight: 700;">Support:</span> <a href="#" style="color: #007185;">contact seller</a></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- customer reviews section -->
+    <div class="reviews-section">
+      <div class="reviews-header">
+        <span class="rating-large">4.2</span>
+        <div>
+          <div class="stars">★★★★½</div>
+          <div>2,345 global ratings</div>
+        </div>
+      </div>
+
+      <!-- AI generated summary from customers -->
+      <div class="ai-generated" style="margin-bottom: 20px;">
+        <strong>AI-generated from customer reviews:</strong> Customers find the crystal moon lamp to be of good quality, with one describing it as a genius piece of lightwork, and appreciate its cool appearance in the dark. They consider it worth the price, create a lovely atmosphere, and provide a relaxing vibe. While some say it functions well, others report that it doesn't work at all. The size receives mixed feedback, with several customers noting it's somewhat small.
+      </div>
+
+      <!-- sample reviews -->
+      <div class="review-card">
+        <div class="reviewer">S. Sharma</div>
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">Very good product. Performance is so far good. Built quality is also awesome. It gives aesthetic looks to my desk. I am happy with this product.</div>
+      </div>
+      <div class="review-card">
+        <div class="reviewer">Priya M.</div>
+        <div class="review-stars">★★★★☆</div>
+        <div class="review-text">Good quality product. Perfect for gifting, useful as night light. Little small but looks beautiful.</div>
+      </div>
+      <div class="review-card">
+        <div class="reviewer">Amit K.</div>
+        <div class="review-stars">★★★☆☆</div>
+        <div class="review-text">It's too small and doesn't even look like the picture, only good in photo. But light quality is decent.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- toast & modal (minimal) -->
+  <div id="toast" class="toast">Added to cart ✅</div>
+  <div id="buyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:30px; border-radius:12px; max-width:500px;">
+      <h3>Place Order</h3>
+      <p>Order placement simulation.</p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function addToCart() {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      toast.style.opacity = '1';
+      setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.style.display = 'none', 300); }, 2000);
+    }
+    function buyNow() {
+      document.getElementById('buyModal').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('buyModal').style.display = 'none';
+    }
+    // thumbnail switching
+    document.querySelectorAll('.thumb-item').forEach((thumb, idx) => {
+      thumb.addEventListener('click', function() {
+        document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        const mainImg = document.querySelector('.main-image-container img');
+        // In real implementation, change src accordingly
+        // mainImg.src = this.querySelector('img').src;
+      });
+    });
+  </script>
+</body>
+</html>

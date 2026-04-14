@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BuildMarts Admin</title>
+<style>
+.sidebar { width:220px; background:#1e293b; color:white; height:100vh; padding:20px; position:fixed; top:0; left:0; bottom:0; box-shadow:2px 0 5px rgba(0,0,0,0.1); z-index:999; overflow-y:auto; }
+.sidebar h2 { margin-bottom:20px; font-size:24px; text-align:center; color:#f8f9fa; }
+.nav-btn { display:block; width:100%; text-align:left; padding:12px 14px; margin-bottom:10px; border-radius:8px; cursor:pointer; transition:background .25s ease, transform .2s ease; font-weight:600; border:none; color:white; font-size:16px; }
+.nav-btn:hover { transform:scale(1.01); box-shadow:0 4px 8px rgba(0,0,0,0.2); }
+.nav-dashboard { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.nav-products { background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.nav-orders { background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.nav-users { background:linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.nav-contacts { background:linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.nav-active { box-shadow:0 0 15px rgba(255,255,255,0.3); transform:scale(1.05); }
+.main-content { margin-left:240px; padding:24px 26px 32px; min-height:100vh; background:#f4f6fb; }
+.section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+.section-header h1 { font-size:28px; color:#1e293b; margin:0; }
+.btn-refresh { background:#0f62ff; color:white; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:700; box-shadow:0 3px 10px rgba(15,98,255,0.25); transition:transform .2s ease, box-shadow .2s ease; }
+.btn-refresh:hover { transform:translateY(-1px); box-shadow:0 6px 14px rgba(15,98,255,0.3); }
+.table-container { background:white; border-radius:14px; box-shadow:0 3px 15px rgba(17,24,39,0.08); overflow:hidden; border:1px solid #e6ebf4; }
+.data-table { width:100%; border-collapse:collapse; }
+.data-table th, .data-table td { padding:12px 14px; text-align:left; border-bottom:1px solid #edf2f8; }
+.data-table th { background:#f3f6fd; color:#0f2f5c; font-weight:700; }
+.data-table tbody tr:hover { background:#f7f9ff; }
+.action-btn { border:none; border-radius:8px; padding:6px 10px; color:#fff; font-weight:600; cursor:pointer; }
+.delete-btn { background:#e02020; }
+.delete-btn:hover { background:#c50f0f; }
+</style>
+</head>
+
+<body style="margin:0;font-family:Arial;background:#f1f5f9;display:flex;">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h2>BuildMarts</h2>
+<button class="nav-btn nav-dashboard nav-active" onclick="location.href='admin_dashboard.html'">📊 Dashboard</button>
+
+<button class="nav-btn nav-products nav-active" onclick="location.href='admin-products.html'">📦 Products</button>
+<button class="nav-btn nav-orders" onclick="location.href='admin-orders.html'">🛒 Orders</button>
+<button class="nav-btn nav-users" onclick="location.href='admin-users.html'">👥 Users</button>
+<button class="nav-btn nav-contacts" onclick="location.href='admin-contacts.html'">📬 Contacts</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+<div class="section-header">
+  <h1>Products</h1>
+  <button class="btn-refresh" onclick="loadProducts()">🔄 Refresh</button>
+</div>
+
+<div class="table-container">
+<table class="data-table" id="productTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Price</th>
+<th>Category</th>
+<th>Image</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="6" style="text-align:center; padding:18px; color:#556774;">Loading...</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+
+// ✅ LOAD PRODUCTS
+function loadProducts() {
+
+fetch('https://buildmarts.in/api/product_uploads')
+.then(res => res.json())
+.then(data => {
+
+console.log("API DATA:", data); // DEBUG
+
+if (!data.success) {
+  alert("API Error");
+  return;
+}
+
+if (data.products.length === 0) {
+  document.querySelector('#productTable tbody').innerHTML =
+    `<tr><td colspan="6" style="text-align:center;">No Products Found</td></tr>`;
+  return;
+}
+
+let html = '';
+
+data.products.forEach(p => {
+  html += `
+  <tr>
+    <td>${p.id}</td>
+    <td>${p.productName}</td>
+    <td>₹${p.finalPrice}</td>
+    <td>${p.category}</td>
+    <td>
+      ${p.imageUrl ? `<img src="${p.imageUrl}" width="50"/>` : 'No Image'}
+    </td>
+    <td>
+      <button onclick="deleteProduct(${p.id})" style="background:red;color:white;">Delete</button>
+    </td>
+  </tr>`;
+});
+
+document.querySelector('#productTable tbody').innerHTML = html;
+
+})
+.catch(err => {
+console.error("ERROR:", err);
+document.querySelector('#productTable tbody').innerHTML =
+  `<tr><td colspan="6" style="text-align:center;color:red;">Error loading data</td></tr>`;
+});
+
+}
+
+// ✅ DELETE PRODUCT
+function deleteProduct(id) {
+
+if (!confirm("Are you sure to delete?")) return;
+
+fetch(`https://buildmarts.in/api/product_uploads/${id}`, {
+method: 'DELETE'
+})
+.then(res => res.json())
+.then(data => {
+  alert("Product Deleted");
+  loadProducts();
+})
+.catch(err => {
+  console.error(err);
+  alert("Delete failed");
+});
+
+}
+
+// ✅ AUTO LOAD
+loadProducts();
+
+</script>
+
+</body>
+</html>
