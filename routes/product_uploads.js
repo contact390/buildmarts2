@@ -31,7 +31,7 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
+      cb(null, true);            
     } else {
       cb(new Error('Invalid file type. Only JPG, PNG, GIF, and WebP allowed'));
     }

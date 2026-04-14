@@ -576,6 +576,27 @@ router.post('/reset-password', (req, res) => {
 });
 
 
+router.put('/approve-seller/:id', (req, res) => {
+  const id = req.params.id;
+
+  db.query('UPDATE seller_profiles SET status="approved" WHERE id=?', [id], (err) => {
+    if (err) return res.status(500).json({ success:false });
+    res.json({ success:true });
+  });
+});
+
+
+router.put('/block-user/:type/:id', (req, res) => {
+  const { type, id } = req.params;
+
+  const table = type === 'seller' ? 'seller_profiles' : 'buyer_profiles';
+
+  db.query(`UPDATE ${table} SET status="blocked" WHERE id=?`, [id], (err) => {
+    if (err) return res.status(500).json({ success:false });
+    res.json({ success:true });
+  });
+});
+
 
 module.exports = router;
 

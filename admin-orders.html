@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Advanced Orders Admin</title>
+<style>
+.sidebar { width:220px; background:#1e293b; color:white; height:100vh; padding:20px; position:fixed; top:0; left:0; bottom:0; box-shadow:2px 0 5px rgba(0,0,0,0.1); z-index:999; overflow-y:auto; }
+.sidebar h2 { margin-bottom:20px; font-size:24px; text-align:center; color:#f8f9fa; }
+.nav-btn { display:block; width:100%; text-align:left; padding:12px 14px; margin-bottom:10px; border-radius:8px; cursor:pointer; transition:background .25s ease, transform .2s ease; font-weight:600; border:none; color:white; font-size:16px; }
+.nav-btn:hover { transform:scale(1.01); box-shadow:0 4px 8px rgba(0,0,0,0.2); }
+.nav-dashboard { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.nav-products { background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.nav-orders { background:linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.nav-users { background:linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.nav-contacts { background:linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.nav-active { box-shadow:0 0 15px rgba(255,255,255,0.3); transform:scale(1.05); }
+.main-content { margin-left:240px; padding:24px; min-height:100vh; background:#f4f6fb; }
+.section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+.section-header h1 { margin:0; color:#1e2f58; font-size:28px; }
+.btn-primary { background:#0f62ff; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:700; box-shadow:0 3px 10px rgba(15,98,255,0.25); }
+.btn-primary:hover { transform:translateY(-1px); }
+.table-container { background:#fff; border-radius:14px; box-shadow:0 3px 15px rgba(17,24,39,0.08); border:1px solid #e6ebf4; overflow:hidden; }
+.data-table { width:100%; border-collapse:collapse; }
+.data-table th, .data-table td { padding:12px 14px; border-bottom:1px solid #edf2f8; }
+.data-table th { background:#f3f6fd; color:#0f2f5c; font-weight:700; }
+.data-table tbody tr:hover { background:#f7f9ff; }
+.action-btn { padding:6px 10px; border:none; border-radius:8px; color:#fff; font-weight:700; cursor:pointer; }
+.btn-delete { background:#e02020; }
+.btn-delete:hover { background:#c41010; }
+</style>
+</head>
+
+<body style="margin:0;font-family:Arial;background:#f1f5f9;display:flex;">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h2>BuildMarts</h2>
+<button class="nav-btn nav-dashboard nav-active" onclick="location.href='admin_dashboard.html'">📊 Dashboard</button>
+
+<button class="nav-btn nav-products" onclick="location.href='admin-products.html'">📦 Products</button>
+<button class="nav-btn nav-orders nav-active" onclick="location.href='admin-orders.html'">🛒 Orders</button>
+<button class="nav-btn nav-users" onclick="location.href='admin-users.html'">👥 Users</button>
+<button class="nav-btn nav-contacts" onclick="location.href='admin-contacts.html'">📬 Contacts</button>
+</div>
+
+<!-- CONTENT -->
+<div class="main-content">
+
+<h1>Orders Management</h1>
+
+<!-- SEARCH + FILTER -->
+<input type="text" id="searchInput" placeholder="Search by name/email"
+style="padding:8px;width:200px;">
+
+<input type="date" id="dateFilter" style="padding:8px;">
+
+<button onclick="loadOrders()">Filter</button>
+
+<br><br>
+
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>ID</th>
+<th>Customer</th>
+<th>Email</th>
+<th>Total</th>
+<th>Status</th>
+<th>Date</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="ordersTable"></tbody>
+</table>
+
+</div>
+
+<!-- POPUP -->
+<div id="popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);">
+<div style="background:white;padding:20px;width:600px;margin:50px auto;">
+
+<h2>Order Details</h2>
+<div id="popupContent"></div>
+
+<button onclick="printInvoice()">Print Invoice</button>
+<button onclick="closePopup()">Close</button>
+
+</div>
+</div>
+
+<script>
+
+let allOrders = [];
+let currentOrder = null;
+
+// LOAD ORDERS
+function loadOrders() {
+fetch('http://localhost:5000/api/all-orders')
+.then(res => res.json())
+.then(data => {
+
+allOrders = data.orders;
+displayOrders();
+
+});
+}
+
+// DISPLAY FILTERED
+function displayOrders() {
+
+const search = document.getElementById("searchInput").value.toLowerCase();
+const date = document.getElementById("dateFilter").value;
+
+let html = '';
+
+allOrders.forEach(order => {
+
+if (
+(order.customer_name.toLowerCase().includes(search) ||
+order.email.toLowerCase().includes(search))
+&& (!date || order.created_at.startsWith(date))
+) {
+
+html += `
+<tr>
+<td>${order.id}</td>
+<td>${order.customer_name}</td>
+<td>${order.email}</td>
+<td>₹${order.total}</td>
+
+<td>
+<select onchange="updateStatus(${order.id}, this.value)">
+<option ${order.status=='pending'?'selected':''}>pending</option>
+<option ${order.status=='delivered'?'selected':''}>delivered</option>
+</select>
+</td>
+
+<td>${new Date(order.created_at).toLocaleDateString()}</td>
+
+<td>
+<button onclick="viewOrder(${order.id})">View</button>
+</td>
+</tr>
+`;
+}
+
+});
+
+document.getElementById("ordersTable").innerHTML = html || `<tr><td colspan="7">No Data</td></tr>`;
+}
+
+// UPDATE STATUS
+function updateStatus(id, status) {
+
+fetch(`http://localhost:5000/api/update-order-status/${id}`, {
+method: 'PUT',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ status })
+})
+.then(() => alert("Status Updated"));
+
+}
+
+// VIEW ORDER POPUP
+function viewOrder(id) {
+
+const order = allOrders.find(o => o.id === id);
+currentOrder = order;
+
+let html = `
+<p><b>Customer:</b> ${order.customer_name}</p>
+<p><b>Email:</b> ${order.email}</p>
+<p><b>Total:</b> ₹${order.total}</p>
+
+<table border="1" width="100%">
+<tr><th>Product</th><th>Qty</th><th>Price</th></tr>
+`;
+
+order.items.forEach(item => {
+html += `<tr>
+<td>${item.name}</td>
+<td>${item.qty}</td>
+<td>₹${item.price}</td>
+</tr>`;
+});
+
+html += `</table>`;
+
+document.getElementById("popupContent").innerHTML = html;
+document.getElementById("popup").style.display = "block";
+}
+
+// CLOSE POPUP
+function closePopup() {
+document.getElementById("popup").style.display = "none";
+}
+
+// PRINT
+function printInvoice() {
+const printContent = document.getElementById("popupContent").innerHTML;
+const win = window.open('', '', 'width=800,height=600');
+win.document.write(printContent);
+win.print();
+}
+
+loadOrders();
+
+</script>
+
+</body>
+</html>    

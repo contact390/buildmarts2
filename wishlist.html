@@ -134,6 +134,7 @@
     <script>
         let wishlist = JSON.parse(localStorage.getItem('productWishlist')) || [];
         let wishlistProducts = [];
+        let wishlistQuantities = JSON.parse(localStorage.getItem('wishlistQuantities')) || {};
         
         // Cart functionality with proper initialization
         let cart = [];
@@ -309,7 +310,7 @@
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:10px;">
                             <div style="display:flex;align-items:center;border:1px solid #ddd;border-radius:5px;">
                                 <button class="decrease-qty" style="border:none;background:#eee;padding:5px 10px;cursor:pointer;font-weight:bold;border-radius:4px 0 0 4px;" onclick="decreaseQty('qty-${product.id}')">-</button>
-                                <span class="quantity-display" id="qty-${product.id}" style="padding:5px 10px;min-width:30px;text-align:center;font-weight:bold;">1</span>
+                                <span class="quantity-display" id="qty-${product.id}" style="padding:5px 10px;min-width:30px;text-align:center;font-weight:bold;">${wishlistQuantities[product.id] || 1}</span>
                                 <button class="increase-qty" style="border:none;background:#eee;padding:5px 10px;cursor:pointer;font-weight:bold;border-radius:0 4px 4px 0;" onclick="increaseQty('qty-${product.id}')">+</button>
                             </div>
                           <button onclick='addToCartWithQty(${JSON.stringify(product).replace(/'/g, "\\'").replace(/"/g, '&quot;')}, document.getElementById("qty-${product.id}").textContent)' 
@@ -378,6 +379,10 @@
             let qty = parseInt(element.textContent);
             if (qty > 1) {
                 element.textContent = qty - 1;
+                // Extract product ID from element ID (format: qty-{productId})
+                const productId = elementId.replace('qty-', '');
+                wishlistQuantities[productId] = qty - 1;
+                localStorage.setItem('wishlistQuantities', JSON.stringify(wishlistQuantities));
             }
         }
 
@@ -386,6 +391,10 @@
             const element = document.getElementById(elementId);
             let qty = parseInt(element.textContent);
             element.textContent = qty + 1;
+            // Extract product ID from element ID (format: qty-{productId})
+            const productId = elementId.replace('qty-', '');
+            wishlistQuantities[productId] = qty + 1;
+            localStorage.setItem('wishlistQuantities', JSON.stringify(wishlistQuantities));
         }
 
         // Function to add to cart with quantity
@@ -663,6 +672,9 @@
             if (index > -1) {
                 wishlist.splice(index, 1);
                 localStorage.setItem('productWishlist', JSON.stringify(wishlist));
+                // Clean up the quantity data for this product
+                delete wishlistQuantities[productId];
+                localStorage.setItem('wishlistQuantities', JSON.stringify(wishlistQuantities));
                 showToast(`${productName} removed from wishlist!`, 'success');
                 loadWishlist();
             }
@@ -677,6 +689,8 @@
         function confirmClearWishlist() {
             wishlist = [];
             localStorage.setItem('productWishlist', JSON.stringify(wishlist));
+            wishlistQuantities = {};
+            localStorage.setItem('wishlistQuantities', JSON.stringify(wishlistQuantities));
             showToast('Wishlist cleared!', 'success');
             loadWishlist();
             document.getElementById('clearWishlistModal').style.display = 'none';
