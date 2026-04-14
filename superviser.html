@@ -690,7 +690,11 @@
 <script>
     (async function(){
         try{
+<<<<<<< HEAD
             const res = await fetch('https://buildmarts.in/api/me', { credentials: 'include' });
+=======
+            const res = await fetch('http://localhost:5000/api/me', { credentials: 'include' });
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
             const data = await res.json();
             const a = document.getElementById('loginLink');
             const l = document.getElementById('logoutLink');
@@ -700,7 +704,11 @@
                 a.href = (user.userType === 'seller') ? 'seller_dashboard.html' : 'buyer_dashboard.html';
                 if (l) {
                     l.style.display = 'inline-block';
+<<<<<<< HEAD
                     l.onclick = async function(e){ e.preventDefault(); await fetch('https://buildmarts.in/api/logout', { method: 'POST', credentials: 'include' }); location.reload(); };
+=======
+                    l.onclick = async function(e){ e.preventDefault(); await fetch('http://localhost:5000/api/logout', { method: 'POST', credentials: 'include' }); location.reload(); };
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
                 }
             } else if (a) {
                 a.textContent = 'Login'; a.href = 'login.html'; if (l) l.style.display = 'none';

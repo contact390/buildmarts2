@@ -109,7 +109,11 @@
 
     <label style="display:block;margin-bottom:6px;color:black">Email *</label>
     <input type="email" id="forgotEmail" required
+<<<<<<< HEAD
       style="width:90%;padding:14px;margin-bottom:12px;border:1px solid #ccc;border-radius:8px;margin-left: 5px;">
+=======
+      style="width:90%;padding:14px;margin-bottom:12px;border:1px solid #ccc;border-radius:8px;">
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 
     <label style="display:block;margin-bottom:6px;color:black">Your Account Type *</label>
     <div style="display:flex;gap:20px;margin-bottom:15px;font-size:14px;">
@@ -160,7 +164,11 @@
 
     <label style="display:block;margin-bottom:6px;color:black;">Enter OTP *</label>
     <input type="text" id="resetOTP" required maxlength="6"
+<<<<<<< HEAD
       style="width:90%;padding:14px;margin-bottom:15px;border:1px solid #ccc;border-radius:8px;margin-left: 5px;" placeholder="6-digit code">
+=======
+      style="width:90%;padding:14px;margin-bottom:15px;border:1px solid #ccc;border-radius:8px;" placeholder="6-digit code">
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 
     <button onclick="verifyResetOTP()"
       style="
@@ -279,9 +287,15 @@
             return;
           }
           if (userType === 'buyer') {
+<<<<<<< HEAD
             window.location.href = "index.html";
           } else {
             window.location.href = "index.html";
+=======
+            window.location.href = "/index.html";
+          } else {
+            window.location.href = "/seller_dashboard.html";
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
           }
         }, 500);
       } else {

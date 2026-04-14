@@ -71,7 +71,11 @@
         try {
             debug('Checking auth...', {});
             
+<<<<<<< HEAD
             const res = await fetch('http://localhost:5000/api/me', { 
+=======
+            const res = await fetch('https://buildmarts.in/api/me', { 
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
@@ -161,7 +165,11 @@
         try {
             debug('Fetching orders for seller', sellerId);
             
+<<<<<<< HEAD
             const res = await fetch(`http://localhost:5000/api/seller_orders/${sellerId}`, { 
+=======
+            const res = await fetch(`https://buildmarts.in/api/seller_orders/${sellerId}`, { 
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
@@ -220,7 +228,11 @@
 
     async function loadDetails(orderId) {
         try {
+<<<<<<< HEAD
             const res = await fetch(`http://localhost:5000/api/order/${orderId}`, { 
+=======
+            const res = await fetch(`https://buildmarts.in/api/order/${orderId}`, { 
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
@@ -260,7 +272,11 @@
 
     async function logout() {
         try {
+<<<<<<< HEAD
             const res = await fetch('http://localhost:5000/api/logout', {
+=======
+            const res = await fetch('https://buildmarts.in/api/logout', {
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
                 method: 'POST',
                 credentials: 'include'
             });

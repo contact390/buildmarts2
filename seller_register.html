@@ -61,11 +61,22 @@
       <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">GST Number</label>
       <input type="text" name="gst" placeholder="GST Number" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;">
       
+<<<<<<< HEAD
       <div style="text-align:right;">
         <button type="submit" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 15px;">Submit Profile</button>
       </div>
       
       <p style="margin-top:15px;text-align:center;font-size:14px;">Already have an account?                   
+=======
+      <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Password *</label>
+      <input type="password" name="password" placeholder="Min 6 characters" required style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:20px;border:1px solid #ccc;border-radius:5px;">
+      
+      <div style="text-align:right;">
+        <button type="submit" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 10px;">Submit Profile</button>
+      </div>
+      
+      <p style="margin-top:15px;text-align:center;font-size:14px;">Already have an account?
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
         <a href="login.html" style="color:#007BFF;text-decoration:underline;font-weight:bold;">Login</a>
       </p>
 
@@ -82,10 +93,17 @@
     </p>
 
     <label style="display:block;margin-bottom:5px;font-weight:normal;margin-left: 10px;">Verification Code *</label>
+<<<<<<< HEAD
     <input type="text" id="otpInput" style="margin-left: 12px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Enter 6-digit OTP" maxlength="6" required>
 
     <div style="text-align:right;">
       <button type="button" onclick="sellerVerifyOTP()" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 15px;">Verify OTP</button>
+=======
+    <input type="text" id="otpInput" style="margin-left: 10px;   width:87%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:5px;" placeholder="Enter 6-digit OTP" maxlength="6" required>
+
+    <div style="text-align:right;">
+      <button type="button" onclick="sellerVerifyOTP()" style="width:50%;padding:12px;background:#28a745;color:#fff;border:none;border-radius:5px;font-size:16px;cursor:pointer;font-weight:bold;margin-right: 10px;">Verify OTP</button>
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
     </div>
 
     <p style="text-align:center;margin-top:15px;font-size:13px;">
@@ -95,6 +113,7 @@
     <p id="otpMessage" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:14px;display:none;font-weight:bold;"></p>
   </div>
 
+<<<<<<< HEAD
   <!-- Set Password Section -->
   <div id="setPasswordSection" style="display:none;width:90%;max-width:360px;margin:10px auto 50px;background:#fff;padding:25px 20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
     <h2 style="text-align:center;margin-bottom:20px;">Set Your Password</h2>
@@ -115,6 +134,10 @@
 
     <p id="passwordMessage" style="margin-top:15px;padding:10px;border-radius:5px;text-align:center;font-size:14px;display:none;font-weight:bold;"></p>
   </div>
+=======
+
+
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 
 <script>
 let sellerOtpVerified = false;
@@ -125,11 +148,20 @@ document.getElementById('sellerForm').addEventListener('submit', async function(
 
   const messageEl = document.getElementById('message');
 
+<<<<<<< HEAD
       const fields = [
     document.querySelector('input[name="name"]'),
     document.querySelector('input[name="email"]'),
     document.querySelector('input[name="phone"]'),
     document.querySelector('input[name="address"]')
+=======
+  const fields = [
+    document.querySelector('input[name="name"]'),
+    document.querySelector('input[name="email"]'),
+    document.querySelector('input[name="phone"]'),
+    document.querySelector('input[name="address"]'),
+    document.querySelector('input[name="password"]')
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
   ];
 
   // Scroll helper function
@@ -165,6 +197,10 @@ document.getElementById('sellerForm').addEventListener('submit', async function(
   const company = document.querySelector('input[name="company"]').value.trim();
   const address = fields[3].value.trim();
   const gst = document.querySelector('input[name="gst"]').value.trim();
+<<<<<<< HEAD
+=======
+  const password = fields[4].value;
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 
   const phoneRegex = /^[6-9]\d{9}$/;
 
@@ -179,8 +215,24 @@ document.getElementById('sellerForm').addEventListener('submit', async function(
     return;
   }
 
+<<<<<<< HEAD
   // Store registration data (without password initially)
   sellerRegistrationData = { name, email, phone, address };
+=======
+  if (password.length < 6) {
+
+    scrollToField(fields[4]);
+
+    messageEl.style.color = 'red';
+    messageEl.innerText = '❌ Password must be at least 6 characters.';
+    messageEl.style.display = 'block';
+
+    return;
+  }
+
+  // Store registration data
+  sellerRegistrationData = { name, email, phone, address, password };
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
   if (company) sellerRegistrationData.company = company;
   if (gst) sellerRegistrationData.gst = gst;
 
@@ -246,6 +298,7 @@ function sellerVerifyOTP() {
     if (data.success) {
       sellerOtpVerified = true;
       otpMessageEl.style.color = 'green';
+<<<<<<< HEAD
       otpMessageEl.innerText = '✅ OTP verified! Please set your password...';
       
       // Show password setup form
@@ -253,6 +306,12 @@ function sellerVerifyOTP() {
         document.getElementById('otpSection').style.display = 'none';
         document.getElementById('setPasswordSection').style.display = 'block';
       }, 1500);
+=======
+      otpMessageEl.innerText = '✅ OTP verified! Completing registration...';
+      
+      // Proceed with actual registration
+      sellerCompleteRegistration();
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
     } else {
       otpMessageEl.style.color = 'red';
       otpMessageEl.innerText = '❌ ' + (data.message || 'Invalid OTP');
@@ -268,6 +327,7 @@ function sellerVerifyOTP() {
 }
 
 function sellerCompleteRegistration() {
+<<<<<<< HEAD
   const passwordMessageEl = document.getElementById('passwordMessage');
   const passwordSection = document.getElementById('setPasswordSection');
 <<<<<<< HEAD
@@ -287,6 +347,9 @@ function sellerCompleteRegistration() {
   messageEl.style.color = '#007BFF';
   messageEl.innerText = '⏳ Completing registration...';
   messageEl.style.display = 'block';
+=======
+  const otpMessageEl = document.getElementById('otpMessage');
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 
   fetch('https://buildmarts.in/api/seller-profile', {
     method: 'POST',
@@ -298,6 +361,7 @@ function sellerCompleteRegistration() {
   })
   .then(response => response.json())
   .then(result => {
+<<<<<<< HEAD
     if (result.success) {
       messageEl.style.color = 'green';
       messageEl.innerText = '✅ Registration successful! Redirecting to login...';
@@ -311,13 +375,49 @@ function sellerCompleteRegistration() {
       messageEl.style.color = 'red';
       messageEl.innerText = '❌ ' + (result.error || 'Registration failed.');
       messageEl.style.display = 'block';
+=======
+    if (response.status === 200 || result.success) {
+      otpMessageEl.style.color = 'green';
+      otpMessageEl.innerText = '✅ Registration successful! Logging you in...';
+      otpMessageEl.style.display = 'block';
+
+      // automatically save session and redirect to seller dashboard
+      if (result.user) {
+        const u = result.user;
+        const userInfo = {
+          id: u.id,
+          userId: u.id,
+          name: u.name,
+          email: u.email,
+          userType: u.userType || 'seller',
+          loginTime: new Date().toISOString()
+        };
+        localStorage.setItem('userSession', JSON.stringify(userInfo));
+        localStorage.setItem('isLoggedIn', 'true');
+      }
+
+      setTimeout(() => {
+        window.location.href = 'seller_dashboard.html';
+      }, 1500);
+
+    } else {
+      otpMessageEl.style.color = 'red';
+      otpMessageEl.innerText = '❌ ' + (result.error || 'Registration failed.');
+      otpMessageEl.style.display = 'block';
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
     }
   })
   .catch(error => {
     console.error('❌ Error:', error);
+<<<<<<< HEAD
     messageEl.style.color = 'red';
     messageEl.innerText = '❌ Unable to complete registration. ' + error.message;
     messageEl.style.display = 'block';
+=======
+    otpMessageEl.style.color = 'red';
+    otpMessageEl.innerText = '❌ Unable to complete registration.';
+    otpMessageEl.style.display = 'block';
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
   });
 }
 
@@ -328,11 +428,15 @@ function sellerResendOTP() {
 function sellerBackToForm() {
   document.getElementById('sellerForm').style.display = 'block';
   document.getElementById('otpSection').style.display = 'none';
+<<<<<<< HEAD
   document.getElementById('setPasswordSection').style.display = 'none';
+=======
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
   document.getElementById('otpInput').value = '';
   document.getElementById('otpMessage').style.display = 'none';
   sellerOtpVerified = false;
 }
+<<<<<<< HEAD
 
 function completeSellerPasswordSetup() {
   const password = document.getElementById('passwordInput').value;
@@ -366,6 +470,8 @@ function completeSellerPasswordSetup() {
   // Proceed with actual registration
   sellerCompleteRegistration();
 }
+=======
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 </script>
 
 <div id="footer-placeholder"></div>

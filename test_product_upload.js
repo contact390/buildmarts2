@@ -89,7 +89,11 @@ async function testGetRequests() {
   // Test 1: Get all products
   console.log('1️⃣ GET /api/product_uploads');
   try {
+<<<<<<< HEAD
     const response = await fetch('http://localhost:5000/api/product_uploads?limit=5');
+=======
+    const response = await fetch('https://buildmarts.in/api/product_uploads?limit=5');
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
     const data = await response.json();
     console.log(`✅ Success: Found ${data.total} products`);
     if (data.products.length > 0) {
@@ -102,7 +106,11 @@ async function testGetRequests() {
   // Test 2: Get by category
   console.log('\n2️⃣ GET /api/product_uploads/category/cement');
   try {
+<<<<<<< HEAD
     const response = await fetch('http://localhost:5000/api/product_uploads/category/cement?limit=5');
+=======
+    const response = await fetch('https://buildmarts.in/api/product_uploads/category/cement?limit=5');
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
     const data = await response.json();
     console.log(`✅ Success: Found ${data.total} cement products`);
   } catch (err) {
@@ -112,7 +120,11 @@ async function testGetRequests() {
   // Test 3: Get specific product (if exists)
   console.log('\n3️⃣ GET /api/product_uploads/1');
   try {
+<<<<<<< HEAD
     const response = await fetch('http://localhost:5000/api/product_uploads/1');
+=======
+    const response = await fetch('https://buildmarts.in/api/product_uploads/1');
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
     if (response.status === 404) {
       console.log('⚠️ Product not found (expected if no products uploaded)');
     } else {
@@ -184,7 +196,11 @@ function displayEndpoints() {
 // Run tests
 async function runTests() {
   console.log('🔧 Product Upload API - Test Suite\n');
+<<<<<<< HEAD
   console.log('🌍 Base URL: http://localhost:5000/api\n');
+=======
+  console.log('🌍 Base URL: https://buildmarts.in/api\n');
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
   console.log('⚠️  Make sure server is running: node server.js\n');
   
   displayEndpoints();
@@ -193,7 +209,11 @@ async function runTests() {
   await testUploadProduct();
   
   console.log('\n\n✨ Test complete!\n');
+<<<<<<< HEAD
   console.log('📝 Frontend Form: http://localhost:5000/productslatestuploads.html');
+=======
+  console.log('📝 Frontend Form: https://buildmarts.in/productslatestuploads.html');
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
   console.log('📖 API Docs: See PRODUCT_UPLOAD_API.md\n');
 }
 

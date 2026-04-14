@@ -576,6 +576,7 @@ router.post('/reset-password', (req, res) => {
 });
 
 
+<<<<<<< HEAD
 router.put('/approve-seller/:id', (req, res) => {
   const id = req.params.id;
 
@@ -597,6 +598,8 @@ router.put('/block-user/:type/:id', (req, res) => {
   });
 });
 
+=======
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 
 module.exports = router;
 

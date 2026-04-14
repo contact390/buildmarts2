@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -764,3 +765,607 @@
 
 
 
+=======
+const express = require('express');
+const router = express.Router();
+const db = require('../db');
+const bcrypt = require('bcrypt');
+
+const SALT_ROUNDS = 10;
+
+// Middleware to check if user is admin
+const checkAdmin = (req, res, next) => {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ success: false, message: 'Not authenticated' });
+  }
+  
+  db.query('SELECT userType FROM users WHERE id = ?', [req.session.userId], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+    
+    if (results.length === 0 || results[0].userType !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Admin access required' });
+    }
+    
+    next();
+  });
+};
+
+// ============== ADMIN LOGIN (with bcrypt) ==============
+router.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Email and password required' });
+  }
+  
+  const query = 'SELECT id, userType, name, email, password FROM users WHERE email = ? AND userType = "admin"';
+  
+  db.query(query, [email], async (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+    }
+    
+    const user = results[0];
+    
+    try {
+      // Compare hashed password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      
+      if (!passwordMatch) {
+        return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+      }
+      
+      // Password match - set session
+      req.session.userId = user.id;
+      req.session.userType = 'admin';
+      req.session.userName = user.name;
+      
+      res.json({
+        success: true,
+        message: 'Admin login successful',
+        user: { id: user.id, name: user.name, email: user.email, userType: 'admin' }
+      });
+    } catch (error) {
+      console.error('Password comparison error:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+});
+
+// ============== ADMIN REGISTRATION (with bcrypt) ==============
+router.post('/register', checkAdmin, async (req, res) => {
+  const { name, email, password, phone } = req.body;
+  
+  if (!name || !email || !password) {
+    return res.status(400).json({ success: false, message: 'Name, email, and password are required' });
+  }
+  
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ success: false, message: 'Invalid email format' });
+  }
+  
+  // Validate password length
+  if (password.length < 6) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+  }
+  
+  // Check if email already exists
+  const checkQuery = 'SELECT id FROM users WHERE email = ?';
+  db.query(checkQuery, [email], async (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+    
+    if (results.length > 0) {
+      return res.status(400).json({ success: false, message: 'Email already registered' });
+    }
+    
+    try {
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+      
+      // Insert new admin user
+      const insertQuery = 'INSERT INTO users (name, email, password, phone, userType, createdAt) VALUES (?, ?, ?, ?, ?, NOW())';
+      
+      db.query(insertQuery, [name, email, hashedPassword, phone || null, 'admin'], (err, result) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ success: false, message: 'Failed to register admin' });
+        }
+        
+        res.json({
+          success: true,
+          message: 'Admin registered successfully',
+          user: {
+            id: result.insertId,
+            name,
+            email,
+            userType: 'admin'
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Password hashing error:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  });
+});
+
+// ============== GET ADMIN DASHBOARD DATA (Enhanced) ==============
+router.get('/dashboard', checkAdmin, (req, res) => {
+  const dashboardData = {};
+  
+  // Get total users count
+  db.query('SELECT COUNT(*) as total FROM users', (err, userCount) => {
+    if (!err) dashboardData.totalUsers = userCount[0].total;
+    else dashboardData.totalUsers = 0;
+    
+    // Get total products count
+    db.query('SELECT COUNT(*) as total FROM products', (err, productCount) => {
+      if (!err) dashboardData.totalProducts = productCount[0].total;
+      else dashboardData.totalProducts = 0;
+      
+      // Get total orders count
+      db.query('SELECT COUNT(*) as total FROM orders', (err, orderCount) => {
+        if (!err) dashboardData.totalOrders = orderCount[0].total;
+        else dashboardData.totalOrders = 0;
+        
+        // Get total revenue
+        db.query('SELECT COALESCE(SUM(total_amount), 0) as totalRevenue FROM orders WHERE status = "completed"', (err, revenue) => {
+          if (!err) dashboardData.totalRevenue = revenue[0].totalRevenue;
+          else dashboardData.totalRevenue = 0;
+          
+          // Get pending orders count
+          db.query('SELECT COUNT(*) as pending FROM orders WHERE status = "pending"', (err, pending) => {
+            if (!err) dashboardData.pendingOrders = pending[0].pending;
+            else dashboardData.pendingOrders = 0;
+            
+            // Get recent orders
+            db.query('SELECT * FROM orders ORDER BY createdAt DESC LIMIT 5', (err, recentOrders) => {
+              if (!err) dashboardData.recentOrders = recentOrders;
+              else dashboardData.recentOrders = [];
+              
+              // Get low stock products
+              db.query('SELECT id, name, stock FROM products WHERE stock < 10 ORDER BY stock ASC LIMIT 5', (err, lowStock) => {
+                if (!err) dashboardData.lowStock = lowStock;
+                else dashboardData.lowStock = [];
+                
+                res.json({ success: true, data: dashboardData });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
+// ============== MANAGE USERS ==============
+// Get all users
+router.get('/users', checkAdmin, (req, res) => {
+  const query = 'SELECT id, name, email, userType, phone, createdAt FROM users ORDER BY createdAt DESC';
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch users' });
+    }
+    
+    res.json({ success: true, users: results });
+  });
+});
+
+// Get single user details
+router.get('/users/:id', checkAdmin, (req, res) => {
+  const query = 'SELECT id, name, email, userType, phone, createdAt FROM users WHERE id = ?';
+  
+  db.query(query, [req.params.id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to fetch user' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    
+    res.json({ success: true, user: results[0] });
+  });
+});
+
+// Delete user
+router.delete('/users/:id', checkAdmin, (req, res) => {
+  // Prevent deleting self
+  if (req.params.id == req.session.userId) {
+    return res.status(400).json({ success: false, message: 'Cannot delete your own account' });
+  }
+  
+  const query = 'DELETE FROM users WHERE id = ?';
+  
+  db.query(query, [req.params.id], (err) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to delete user' });
+    }
+    
+    res.json({ success: true, message: 'User deleted successfully' });
+  });
+});
+
+// Update user role
+router.put('/users/:id/role', checkAdmin, (req, res) => {
+  const { userType } = req.body;
+  const allowedRoles = ['buyer', 'seller', 'admin'];
+  
+  if (!userType || !allowedRoles.includes(userType)) {
+    return res.status(400).json({ success: false, message: 'Invalid user role' });
+  }
+  
+  const query = 'UPDATE users SET userType = ? WHERE id = ?';
+  
+  db.query(query, [userType, req.params.id], (err) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to update user role' });
+    }
+    
+    res.json({ success: true, message: 'User role updated successfully' });
+  });
+});
+
+// ============== MANAGE PRODUCTS ==============
+// Get all products
+router.get('/products', checkAdmin, (req, res) => {
+  const query = 'SELECT id, name, category, price, stock, uploaded_by, status, createdAt FROM products ORDER BY createdAt DESC';
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to fetch products' });
+    }
+    
+    res.json({ success: true, products: results });
+  });
+});
+
+// Get all products from products_extended table
+router.get('/products/extended', checkAdmin, (req, res) => {
+  const query = 'SELECT * FROM products_extended ORDER BY createdAt DESC LIMIT 1000';
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Products extended error:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch products' });
+    }
+    
+    res.json({ success: true, products: results || [] });
+  });
+});
+
+// Delete product
+router.delete('/products/:id', checkAdmin, (req, res) => {
+  const query = 'DELETE FROM products WHERE id = ?';
+  
+  db.query(query, [req.params.id], (err) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to delete product' });
+    }
+    
+    res.json({ success: true, message: 'Product deleted successfully' });
+  });
+});
+
+// Update product
+router.put('/products/:id', checkAdmin, (req, res) => {
+  const { name, price, stock, category, status } = req.body;
+  const query = 'UPDATE products SET name = ?, price = ?, stock = ?, category = ?, status = ? WHERE id = ?';
+  
+  db.query(query, [name, price, stock, category, status || 'active', req.params.id], (err) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to update product' });
+    }
+    
+    res.json({ success: true, message: 'Product updated successfully' });
+  });
+});
+
+// ============== MANAGE ORDERS ==============
+// Get all orders
+router.get('/orders', checkAdmin, (req, res) => {
+  const query = 'SELECT o.id, o.user_id, u.name as user_name, o.total_amount, o.status, o.createdAt FROM orders o LEFT JOIN users u ON o.user_id = u.id ORDER BY o.createdAt DESC';
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to fetch orders' });
+    }
+    
+    res.json({ success: true, orders: results });
+  });
+});
+
+// Get order details
+router.get('/orders/:id', checkAdmin, (req, res) => {
+  const query = 'SELECT o.*, u.name as user_name, u.email as user_email FROM orders o LEFT JOIN users u ON o.user_id = u.id WHERE o.id = ?';
+  
+  db.query(query, [req.params.id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to fetch order' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    
+    // Get order items
+    db.query('SELECT oi.*, p.name as product_name FROM order_items oi LEFT JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?', [req.params.id], (err, items) => {
+      if (!err) {
+        results[0].items = items;
+      }
+      
+      res.json({ success: true, order: results[0] });
+    });
+  });
+});
+
+// Update order status
+router.put('/orders/:id/status', checkAdmin, (req, res) => {
+  const { status } = req.body;
+  const validStatuses = ['pending', 'processing', 'completed', 'cancelled'];
+  
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ success: false, message: 'Invalid order status' });
+  }
+  
+  const query = 'UPDATE orders SET status = ? WHERE id = ?';
+  
+  db.query(query, [status, req.params.id], (err) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to update order status' });
+    }
+    
+    res.json({ success: true, message: 'Order status updated successfully' });
+  });
+});
+
+// ============== ANALYTICS ==============
+// Get sales analytics
+router.get('/analytics/sales', checkAdmin, (req, res) => {
+  const analyticsData = {};
+  
+  // Monthly sales
+  db.query(`
+    SELECT DATE_FORMAT(createdAt, '%Y-%m') as month, COUNT(*) as count, SUM(total_amount) as total
+    FROM orders
+    WHERE status = 'completed'
+    GROUP BY DATE_FORMAT(createdAt, '%Y-%m')
+    ORDER BY month DESC
+    LIMIT 12
+  `, (err, monthlySales) => {
+    if (!err) analyticsData.monthlySales = monthlySales;
+    else analyticsData.monthlySales = [];
+    
+    // Sales by category
+    db.query(`
+      SELECT p.category, COUNT(oi.id) as productCount, SUM(oi.quantity) as totalQuantity, SUM(oi.price * oi.quantity) as revenue
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      GROUP BY p.category
+      ORDER BY totalQuantity DESC
+    `, (err, byCat) => {
+      if (!err) analyticsData.salesByCategory = byCat;
+      else analyticsData.salesByCategory = [];
+      
+      // Top products
+      db.query(`
+        SELECT p.name, p.id, SUM(oi.quantity) as totalSold, SUM(oi.price * oi.quantity) as revenue
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        GROUP BY p.id
+        ORDER BY totalSold DESC
+        LIMIT 10
+      `, (err, topProducts) => {
+        if (!err) analyticsData.topProducts = topProducts;
+        else analyticsData.topProducts = [];
+        
+        // Customer analytics
+        db.query(`
+          SELECT COUNT(DISTINCT user_id) as totalCustomers,
+                 AVG(total_amount) as avgOrderValue,
+                 MAX(total_amount) as maxOrderValue,
+                 SUM(total_amount) as totalRevenue
+          FROM orders
+          WHERE status = 'completed'
+        `, (err, custAnalytics) => {
+          if (!err && custAnalytics[0]) analyticsData.customerAnalytics = custAnalytics[0];
+          else analyticsData.customerAnalytics = { totalCustomers: 0, avgOrderValue: 0, maxOrderValue: 0, totalRevenue: 0 };
+          
+          // Daily sales for current month
+          db.query(`
+            SELECT DATE(createdAt) as date, SUM(total_amount) as dailyRevenue, COUNT(*) as orderCount
+            FROM orders
+            WHERE status = 'completed' AND MONTH(createdAt) = MONTH(CURRENT_DATE()) AND YEAR(createdAt) = YEAR(CURRENT_DATE())
+            GROUP BY DATE(createdAt)
+            ORDER BY date ASC
+          `, (err, dailySales) => {
+            if (!err) analyticsData.dailySales = dailySales;
+            else analyticsData.dailySales = [];
+            
+            res.json({ success: true, analytics: analyticsData });
+          });
+        });
+      });
+    });
+  });
+});
+
+// Get user statistics
+router.get('/analytics/users', checkAdmin, (req, res) => {
+  const query = `
+    SELECT 
+      userType,
+      COUNT(*) as count
+    FROM users
+    GROUP BY userType
+  `;
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to fetch analytics' });
+    }
+    
+    res.json({ success: true, userStats: results });
+  });
+});
+
+// Get inventory analytics
+router.get('/analytics/inventory', checkAdmin, (req, res) => {
+  db.query(`
+    SELECT 
+      SUM(stock) as totalStock,
+      COUNT(*) as totalProducts,
+      AVG(stock) as avgStock,
+      COUNT(CASE WHEN stock < 10 THEN 1 END) as lowStockCount,
+      COUNT(CASE WHEN stock = 0 THEN 1 END) as outOfStockCount
+    FROM products
+  `, (err, stats) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to fetch inventory stats' });
+    }
+    
+    res.json({ success: true, inventory: stats[0] });
+  });
+});
+
+// Get top products for analytics
+router.get('/analytics/top-products', checkAdmin, (req, res) => {
+  db.query(`
+    SELECT p.id, p.name, COUNT(oi.id) as orderCount, SUM(oi.quantity) as totalSold
+    FROM order_items oi
+    JOIN products p ON oi.product_id = p.id
+    GROUP BY p.id, p.name
+    ORDER BY orderCount DESC
+    LIMIT 10
+  `, (err, topProducts) => {
+    if (err) {
+      console.error('Top products error:', err);
+      return res.status(200).json({ success: false, topProducts: [] });
+    }
+    
+    res.json({ success: true, topProducts: topProducts || [] });
+  });
+});
+
+// Get revenue by category for analytics
+router.get('/analytics/revenue', checkAdmin, (req, res) => {
+  db.query(`
+    SELECT p.category, SUM(oi.price * oi.quantity) as total
+    FROM order_items oi
+    JOIN products p ON oi.product_id = p.id
+    GROUP BY p.category
+    ORDER BY total DESC
+  `, (err, revenue) => {
+    if (err) {
+      console.error('Revenue error:', err);
+      return res.status(200).json({ success: false, revenue: [] });
+    }
+    
+    res.json({ success: true, revenue: revenue || [] });
+  });
+});
+
+// Get order statistics for analytics
+router.get('/analytics/orders', checkAdmin, (req, res) => {
+  db.query(`
+    SELECT status, COUNT(*) as count
+    FROM orders
+    GROUP BY status
+  `, (err, orderStats) => {
+    if (err) {
+      console.error('Order stats error:', err);
+      return res.status(200).json({ success: false, orderStats: [] });
+    }
+    
+    res.json({ success: true, orderStats: orderStats || [] });
+  });
+});
+
+// ============== DISCOUNT CODES ==============
+// Get all discount codes
+router.get('/codes', checkAdmin, (req, res) => {
+  const checkTableQuery = `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'discount_codes' LIMIT 1`;
+  
+  db.query(checkTableQuery, (err, columns) => {
+    if (err || !columns || columns.length === 0) {
+      // Table doesn't exist, create it or return empty
+      return res.json({ success: true, codes: [] });
+    }
+    
+    const query = 'SELECT * FROM discount_codes ORDER BY id DESC';
+    db.query(query, (err, results) => {
+      if (err) {
+        return res.status(200).json({ success: true, codes: [] });
+      }
+      
+      res.json({ success: true, codes: results || [] });
+    });
+  });
+});
+
+// Delete discount code
+router.delete('/codes/:id', checkAdmin, (req, res) => {
+  const query = 'DELETE FROM discount_codes WHERE id = ?';
+  
+  db.query(query, [req.params.id], (err) => {
+    if (err) {
+      console.error('Delete code error:', err);
+      return res.status(200).json({ success: true, message: 'Code deleted' });
+    }
+    
+    res.json({ success: true, message: 'Code deleted successfully' });
+  });
+});
+
+// ============== GET CURRENT USER ==============
+router.get('/me', (req, res) => {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ success: false, message: 'Not authenticated' });
+  }
+  
+  db.query('SELECT id, name, email, userType FROM users WHERE id = ?', [req.session.userId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Server error' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(401).json({ success: false, message: 'User not found' });
+    }
+    
+    res.json({ success: true, user: results[0] });
+  });
+});
+
+// ============== LOGOUT ==============
+router.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to logout' });
+    }
+    
+    res.json({ success: true, message: 'Logged out successfully' });
+  });
+
+
+});
+
+
+
+module.exports = router;
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f

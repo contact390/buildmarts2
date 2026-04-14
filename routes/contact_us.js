@@ -117,6 +117,7 @@ router.get('/contact_us/:email', (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 router.delete('/contact_us/:id', (req, res) => {
   const id = req.params.id;
 
@@ -125,5 +126,8 @@ router.delete('/contact_us/:id', (req, res) => {
     res.json({ success:true });
   });
 });
+=======
+
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 
 module.exports = router;

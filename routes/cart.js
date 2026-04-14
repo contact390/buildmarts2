@@ -690,6 +690,7 @@ router.post("/test-email", (req, res) => {
     });
   });
 });
+<<<<<<< HEAD
 router.put('/update-order-status/:id', (req, res) => {
   const orderId = req.params.id;
   const { status } = req.body;
@@ -703,4 +704,7 @@ router.put('/update-order-status/:id', (req, res) => {
     res.json({ success: true, message: 'Status updated' });
   });
 });
+=======
+
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 module.exports = router;

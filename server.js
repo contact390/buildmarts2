@@ -15,9 +15,20 @@ const dealerRoutes = require('./routes/dealer'); // Import dealer routes
 const workforceRoutes = require('./routes/workforce'); // Import workforce routes
 const salesRoutes = require('./routes/sales'); // Import sales routes 
 const factoryRoutes = require('./routes/factory'); // Import factory routes
+<<<<<<< HEAD
 const consultationsRoutes = require('./routes/consultations'); // Import consultations routes 
 const app = express();
 const port = 5000;
+=======
+const consultationsRoutes = require('./routes/consultations'); // Import consultations routes
+const buildersBulkOrdersRoutes = require('./routes/builders-bulkorders'); // Import builders bulk orders routes
+const suppliersRoutes = require('./routes/suppliers'); // Import suppliers routes
+const adminRoutes = require('./routes/admin'); // Import admin routes
+
+
+const app = express();
+const port = 5005;
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 
 // Middleware
 app.use(cors({ 
@@ -55,6 +66,19 @@ const path = require('path');
 // can be opened from https://buildmarts.in/allproducts.html
 app.use(express.static(path.join(__dirname)));
 
+<<<<<<< HEAD
+=======
+// Global logout endpoint
+app.post('/api/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: 'Failed to logout' });
+    }
+    res.json({ success: true, message: 'Logged out successfully' });
+  });
+});
+
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 // Routes
 app.use('/api', profile_registerRoutes);
 app.use('/api', contactUsRoutes);
@@ -69,6 +93,13 @@ app.use('/api', workforceRoutes); // Use workforce routes
 app.use('/api', salesRoutes); // Use sales routes
 app.use('/api', factoryRoutes); // Use factory routes
 app.use('/api', consultationsRoutes); // Use consultations routes
+<<<<<<< HEAD
+=======
+app.use('/api', buildersBulkOrdersRoutes); // Use builders bulk orders routes
+app.use('/api', suppliersRoutes); // Use suppliers routes
+app.use('/api/admin', adminRoutes); // Use admin routes
+
+>>>>>>> 446e9cc322e6defa7982f6adf5707b991ba2416f
 // Start server
 const server = app.listen(port, () => {
   console.log(`🚀 Server running at http://localhost:${port}`);
